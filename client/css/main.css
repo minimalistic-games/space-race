@@ -6,8 +6,7 @@ body {
 }
 
 #canvas {
-    width: 80%;
-    height: 70%;
+    display: block;
     border: 1px solid #ccc;
-    margin: 2em 10%;
+    margin: 2em auto;
 }

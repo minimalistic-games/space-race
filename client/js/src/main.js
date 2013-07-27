@@ -17,5 +17,11 @@ require.config({
 require([
     'app'
 ], function (App) {
-    window.app = new App();
+    var app = new App();
+    app.init();
+
+    /*
+     * storing app reference for debug
+     */
+    window.app = app;
 });
