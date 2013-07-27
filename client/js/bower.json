@@ -1,0 +1,13 @@
+{
+    "name": "space-race",
+    "version": "0.0.0",
+    "main": "src/main.js",
+    "ignore": [
+        "**/.*"
+    ],
+    "dependencies": {
+        "requirejs": "",
+        "underscore": "",
+        "socket.io-client": ""
+    }
+}
