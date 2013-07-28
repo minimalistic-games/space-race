@@ -14,7 +14,15 @@ define([
      * Global application object. Responsible for canvas handling.
      */
     var App = function() {
+        /*
+         * canvas context
+         */
         this.ctx = canvas.getContext('2d');
+
+        /*
+         * global objects registry
+         */
+        this.objects = {};
     };
 
     /*
@@ -30,12 +38,29 @@ define([
      * Starts application
      */
     App.prototype.init = function() {
-        var ship = new Ship(this.ctx, {
-            color: [ 50, 50, 250 ]
-        });
-        ship.render();
+        this.objects = {
+            ship1: new Ship(this.ctx, {
+                color: [ 50, 50, 250 ]
+            }),
+            ship2: new Ship(this.ctx, {
+                color: [ 250, 50, 50 ],
+                coords: [ 150, 150 ],
+                step: 1,
+                size: 40
+            })
+        };
 
-        window.ship = ship;
+        var self = this,
+            draw = function() {
+                window.requestAnimationFrame(draw);
+
+                self.clear();
+                _.each(self.objects, function(object) {
+                    object.render();
+                });
+            };
+
+        window.requestAnimationFrame(draw);
 
         return this;
     };
