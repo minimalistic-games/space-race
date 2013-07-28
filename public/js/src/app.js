@@ -1,8 +1,7 @@
 define([
     'underscore',
-    'socketio',
     'objects/ship'
-], function(_, io, Ship) {
+], function(_, Ship) {
     var canvas = document.getElementById('canvas');
 
     if (!canvas.getContext) {
@@ -61,6 +60,12 @@ define([
             };
 
         window.requestAnimationFrame(draw);
+
+        var socket = io.connect('http://' + window.location.host);
+        socket.on('news', function (data) {
+            console.log(data);
+            socket.emit('my other event', { my: 'data' });
+        });
 
         return this;
     };

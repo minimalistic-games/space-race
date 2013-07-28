@@ -7,7 +7,6 @@
     ],
     "dependencies": {
         "requirejs": "",
-        "underscore": "",
-        "socket.io-client": ""
+        "underscore": ""
     }
 }

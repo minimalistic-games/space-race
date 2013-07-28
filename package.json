@@ -1,0 +1,10 @@
+{
+    "name": "space-race",
+    "description": "simple multiplayer game",
+    "version": "0.0.0",
+    "private": true,
+    "dependencies": {
+        "express": "3.x",
+        "socket.io": ""
+    }
+}
