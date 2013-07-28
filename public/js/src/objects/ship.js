@@ -1,5 +1,7 @@
 define([
 ], function() {
+    "use strict";
+
 	var Ship = function(ctx, options) {
         this.ctx = ctx;
 
@@ -11,6 +13,8 @@ define([
             step: 5
         }, options);
 
+        this.id = null;
+
         /*
          * coords of object's center
          */
@@ -19,6 +23,8 @@ define([
         this.size = this.options.size;
 
         this.direction = 'Up';
+
+        this.socket = null;
 
         this.domEvents = {
             'keydown': this.handleKeyDown
@@ -47,6 +53,17 @@ define([
 
         return this;
 	};
+
+    Ship.prototype.setSocket = function(socket) {
+        this.socket = socket;
+
+        var self = this;
+        this.socket.on('register', function(data) {
+            self.id = data.id;
+        });
+
+        return this;
+    };
 
     Ship.prototype.render = function() {
         var getRectCoord = function(coord, size) { return coord - size / 2; },
@@ -95,7 +112,14 @@ define([
 
         this.coords[axis] = shift(this.coords[axis], this.options.step, _.contains([ 'Down', 'Right' ], key));
 
-        return this.render();
+        if (this.socket) {
+            this.socket.emit('move', {
+                id: this.id,
+                coords: this.coords
+            });
+        }
+
+        return this;
 	};
 
 	return Ship;

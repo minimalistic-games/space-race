@@ -2,6 +2,8 @@ define([
     'underscore',
     'objects/ship'
 ], function(_, Ship) {
+    "use strict";
+
     var canvas = document.getElementById('canvas');
 
     if (!canvas.getContext) {
@@ -59,13 +61,11 @@ define([
                 });
             };
 
+
         window.requestAnimationFrame(draw);
 
         var socket = io.connect('http://' + window.location.host);
-        socket.on('news', function (data) {
-            console.log(data);
-            socket.emit('my other event', { my: 'data' });
-        });
+        this.objects.ship1.setSocket(socket);
 
         return this;
     };
