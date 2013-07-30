@@ -12,7 +12,7 @@ define([
     }
 
     /*
-     * Global application object. Responsible for canvas handling.
+     * Global application object
      */
     var App = function() {
         /*
@@ -21,9 +21,42 @@ define([
         this.ctx = canvas.getContext('2d');
 
         /*
-         * global objects registry
+         * rendering objects registry
          */
         this.objects = {};
+
+        /*
+         * application state transport
+         */
+        this.socket = io.connect('http://' + window.location.host);
+    };
+
+    /*
+     * Starts application
+     */
+    App.prototype.init = function() {
+        this
+            .addInitialObjects()
+            .startDrawingLoop();
+
+        return this;
+    };
+
+    /*
+     * Creates one controlled ship
+     */
+    App.prototype.addInitialObjects = function() {
+        var ship = new Ship(this.ctx, {
+            color: [ 50, 50, 250 ]
+        });
+
+        ship
+            .setSocket(this.socket)
+            .identify();
+
+        this.objects.controlledShip = ship;
+
+        return this;
     };
 
     /*
@@ -36,21 +69,9 @@ define([
     };
 
     /*
-     * Starts application
+     * Redraws all registered objects after cleaning the canvas
      */
-    App.prototype.init = function() {
-        this.objects = {
-            ship1: new Ship(this.ctx, {
-                color: [ 50, 50, 250 ]
-            }),
-            ship2: new Ship(this.ctx, {
-                color: [ 250, 50, 50 ],
-                coords: [ 150, 150 ],
-                step: 1,
-                size: 40
-            })
-        };
-
+    App.prototype.startDrawingLoop = function() {
         var self = this,
             draw = function() {
                 window.requestAnimationFrame(draw);
@@ -61,11 +82,7 @@ define([
                 });
             };
 
-
         window.requestAnimationFrame(draw);
-
-        var socket = io.connect('http://' + window.location.host);
-        this.objects.ship1.setSocket(socket);
 
         return this;
     };

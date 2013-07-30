@@ -16,8 +16,10 @@ app.get('/', function(req, res){
 var idCounter = 1;
 
 io.sockets.on('connection', function (socket) {
-    socket.emit('register', {
-        id: idCounter++
+    socket.on('identify', function (data) {
+        socket.emit('register', {
+            id: data.id ? data.id : idCounter++
+        });
     });
 
     socket.on('move', function (data) {

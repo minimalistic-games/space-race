@@ -13,7 +13,7 @@ define([
             step: 5
         }, options);
 
-        this.id = null;
+        this.id = window.localStorage.getItem('ship:id');
 
         /*
          * coords of object's center
@@ -57,9 +57,18 @@ define([
     Ship.prototype.setSocket = function(socket) {
         this.socket = socket;
 
+        return this;
+    };
+
+    Ship.prototype.identify = function() {
         var self = this;
+
+        this.socket.emit('identify', { id: self.id });
+
         this.socket.on('register', function(data) {
             self.id = data.id;
+
+            window.localStorage.setItem('ship:id', self.id);
         });
 
         return this;
@@ -104,13 +113,13 @@ define([
         if (!_.contains([ 'Up', 'Right', 'Down', 'Left' ], key)) { return; }
 
         var axis = +_.contains([ 'Up', 'Down' ], key),
-            shift = function(coord, step, isPositive) {
+            shiftCoord = function(coord, step, isPositive) {
                 return isPositive ? coord + step : coord - step;
             };
 
         this.direction = key;
 
-        this.coords[axis] = shift(this.coords[axis], this.options.step, _.contains([ 'Down', 'Right' ], key));
+        this.coords[axis] = shiftCoord(this.coords[axis], this.options.step, _.contains([ 'Down', 'Right' ], key));
 
         if (this.socket) {
             this.socket.emit('move', {
