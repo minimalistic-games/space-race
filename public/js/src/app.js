@@ -14,7 +14,7 @@ define([
         return function() {};
     }
 
-    /*
+    /**
      * Global application object
      */
     var App = function() {
@@ -34,7 +34,7 @@ define([
         this.socket = io.connect('http://' + window.location.host);
     };
 
-    /*
+    /**
      * Starts application
      */
     App.prototype.init = function() {
@@ -45,7 +45,7 @@ define([
         return this;
     };
 
-    /*
+    /**
      * Creates one controlled ship
      */
     App.prototype.addInitialObjects = function() {
@@ -75,7 +75,7 @@ define([
         return this;
     };
 
-    /*
+    /**
      * Clears the whole canvas
      */
     App.prototype.clear = function() {
@@ -84,7 +84,7 @@ define([
         return this;
     };
 
-    /*
+    /**
      * Redraws all registered objects after cleaning the canvas
      */
     App.prototype.startDrawingLoop = function() {

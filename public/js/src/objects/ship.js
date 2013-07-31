@@ -2,7 +2,7 @@ define([
 ], function() {
     "use strict";
 
-	var Ship = function(ctx, options) {
+    var Ship = function(ctx, options) {
         this.ctx = ctx;
 
         this.options = _.extend({
@@ -58,7 +58,7 @@ define([
         return this;
     };
 
-	Ship.prototype.initEvents = function() {
+    Ship.prototype.initEvents = function() {
         var shiftCoord = function(coord, step, isPositive) {
             return isPositive ? coord + step : coord - step;
         };
@@ -71,7 +71,7 @@ define([
         });
 
         return this;
-	};
+    };
 
-	return Ship;
+    return Ship;
 });

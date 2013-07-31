@@ -2,11 +2,17 @@ define([
 ], function() {
     "use strict";
 
-    var Ship = function(socket) {
+    var Identifiable = function(socket) {
         this.socket = socket;
     };
 
-    Ship.prototype.identify = function(idStorageKey) {
+    /**
+     * Sends the 'identify' message to server with current id (could be stored in localStorage)
+     * Updates current id on 'register' message received
+     *
+     * @param string idStorageKey An id key for localStorage
+     */
+    Identifiable.prototype.identify = function(idStorageKey) {
         this.id = window.localStorage.getItem(idStorageKey);
 
         this.socket.emit('identify', { id: this.id });
@@ -20,5 +26,5 @@ define([
         return this;
     };
 
-    return Ship;
+    return Identifiable;
 });
