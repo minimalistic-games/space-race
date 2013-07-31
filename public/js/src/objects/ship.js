@@ -13,7 +13,7 @@ define([
             step: 5
         }, options);
 
-        this.id = window.localStorage.getItem('ship:id');
+        this.id = null;
 
         /*
          * coords of object's center
@@ -23,55 +23,6 @@ define([
         this.size = this.options.size;
 
         this.direction = 'Up';
-
-        this.socket = null;
-
-        this.domEvents = {
-            'keydown': this.handleKeyDown
-        };
-        this.attachedDomEvents = {};
-
-        this.toggleDomEvents(true);
-    };
-
-    Ship.prototype.destroy = function() {
-        return this.toggleDomEvents(false);
-    };
-
-	Ship.prototype.toggleDomEvents = function(toAttach) {
-        var self = this;
-		_.each(this.domEvents, function(handler, type) {
-            /*
-             * storing binded event handlers to be able to detach them by reference
-             */
-            if (toAttach) {
-                self.attachedDomEvents[type] = function(e) { return handler.call(self, e); };
-            }
-
-			document[toAttach ? 'addEventListener' : 'removeEventListener'](type, self.attachedDomEvents[type], false);
-		});
-
-        return this;
-	};
-
-    Ship.prototype.setSocket = function(socket) {
-        this.socket = socket;
-
-        return this;
-    };
-
-    Ship.prototype.identify = function() {
-        var self = this;
-
-        this.socket.emit('identify', { id: self.id });
-
-        this.socket.on('register', function(data) {
-            self.id = data.id;
-
-            window.localStorage.setItem('ship:id', self.id);
-        });
-
-        return this;
     };
 
     Ship.prototype.render = function() {
@@ -102,31 +53,22 @@ define([
             - arcStartAngle + directionAngles[this.direction],
             true
         );
-        // this.ctx.stroke();
         this.ctx.fill();
 
         return this;
     };
 
-	Ship.prototype.handleKeyDown = function(e) {
-        var key = e.keyIdentifier;
-        if (!_.contains([ 'Up', 'Right', 'Down', 'Left' ], key)) { return; }
+	Ship.prototype.initEvents = function() {
+        var shiftCoord = function(coord, step, isPositive) {
+            return isPositive ? coord + step : coord - step;
+        };
 
-        var axis = +_.contains([ 'Up', 'Down' ], key),
-            shiftCoord = function(coord, step, isPositive) {
-                return isPositive ? coord + step : coord - step;
-            };
+        this.on('shift', function(data) {
+            this.direction = [ [ 'Left' , 'Right' ], [ 'Up' , 'Down' ] ] [data.axis][+data.isPositive];
+            this.coords[data.axis] = shiftCoord(this.coords[data.axis], this.options.step, data.isPositive);
 
-        this.direction = key;
-
-        this.coords[axis] = shiftCoord(this.coords[axis], this.options.step, _.contains([ 'Down', 'Right' ], key));
-
-        if (this.socket) {
-            this.socket.emit('move', {
-                id: this.id,
-                coords: this.coords
-            });
-        }
+            this.trigger('move', { coords: this.coords });
+        });
 
         return this;
 	};
