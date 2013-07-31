@@ -1,8 +1,11 @@
 define([
-], function() {
+    'events'
+], function(Events) {
     "use strict";
 
     var Controllable = function() {
+        _.extend(this, Events);
+
         this.domEvents = {
             'keydown': this.handleKeyDown
         };

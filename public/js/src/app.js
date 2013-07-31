@@ -1,10 +1,9 @@
 define([
     'underscore',
-    'events',
     'behaviors/controllable',
     'behaviors/identifiable',
     'objects/ship'
-], function(_, Events, Controllable, Identifiable, Ship) {
+], function(_, Controllable, Identifiable, Ship) {
     "use strict";
 
     var canvas = document.getElementById('canvas');
@@ -49,15 +48,11 @@ define([
      * Creates one controlled ship
      */
     App.prototype.addInitialObjects = function() {
-        var ship = new Ship(this.ctx, { color: [ 50, 50, 250 ] }),
+        var ship = new Ship(this.ctx, { color: [ 50, 50, 250 ], size: 40 }),
             controllable = new Controllable(),
             identifiable = new Identifiable(this.socket);
 
-        /*
-         * mixing behaviors and Backbone Events to the ship object
-         * (a dirty hack because Controllable relies on Events too)
-         */
-        _.extend(ship, controllable, identifiable, Events);
+        _.extend(ship, controllable, identifiable);
 
         ship
             .initEvents()
@@ -71,6 +66,11 @@ define([
             }, ship);
 
         this.objects.controlledShip = ship;
+
+        this.objects.uncontrolledShip = new Ship(this.ctx, {
+            coords: [ 200, 200 ],
+            color: [ 200, 100, 100 ]
+        });
 
         return this;
     };

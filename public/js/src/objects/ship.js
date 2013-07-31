@@ -1,8 +1,11 @@
 define([
-], function() {
+    'events'
+], function(Events) {
     "use strict";
 
     var Ship = function(ctx, options) {
+        _.extend(this, Events);
+
         this.ctx = ctx;
 
         this.options = _.extend({
@@ -33,7 +36,7 @@ define([
                 Left: - Math.PI,
                 Down: - Math.PI * 1.5
             },
-            arcStartAngle = Math.PI * 0.2;
+            frontAngle = Math.PI * 0.5;
 
         this.ctx.fillStyle = 'rgba(' + this.options.color.join(',') + ',' + this.options.opacity + ')';
 
@@ -49,8 +52,8 @@ define([
             this.coords[0],
             this.coords[1],
             this.size,
-            arcStartAngle + directionAngles[this.direction],
-            - arcStartAngle + directionAngles[this.direction],
+            frontAngle / 2 + directionAngles[this.direction],
+            - frontAngle / 2 + directionAngles[this.direction],
             true
         );
         this.ctx.fill();
