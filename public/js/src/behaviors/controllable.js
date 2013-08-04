@@ -7,7 +7,8 @@ define([
         _.extend(this, Events);
 
         this.domEvents = {
-            'keydown': this.handleKeyDown
+            'keydown': this.handleKeyDown,
+            'keyup': this.handleKeyUp
         };
         this.attachedDomEvents = {};
     };
@@ -40,6 +41,15 @@ define([
             axis: +_.contains([ 'Up', 'Down' ], key),
             isPositive: _.contains([ 'Down', 'Right' ], key)
         });
+
+        return this;
+    };
+
+    Controllable.prototype.handleKeyUp = function(e) {
+        var key = e.keyIdentifier;
+        if (!_.contains([ 'Up', 'Right', 'Down', 'Left' ], key)) { return; }
+
+        this.trigger('stop');
 
         return this;
     };
