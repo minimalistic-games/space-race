@@ -40,6 +40,7 @@ define([
     App.prototype.init = function() {
         this
             .addInitialObjects()
+            .initEvents()
             .startDrawingLoop();
 
         return this;
@@ -50,7 +51,7 @@ define([
      */
     App.prototype.addInitialObjects = function() {
         var bounds = new Bounds(this.ctx, { color: [ 100, 150, 200 ], width: 10 }),
-            ship = new Ship(this.ctx, { color: [ 50, 50, 250 ], size: 40 }),
+            ship = new Ship(this.ctx, { color: [ 50, 50, 250 ] }),
             controllable = new Controllable(),
             identifiable = new Identifiable(this.socket);
 
@@ -58,22 +59,42 @@ define([
 
         ship
             .toggleDomEvents(true)
-            .identify('controlledShip:id')
-            .on('move', function(data) {
-                this.socket.emit('move', {
-                    id: this.id,
-                    coords: data.coords
-                });
-            }, ship);
+            .identify('controlledShip:id');
 
-        this.objects.bounds = bounds;
+        this.objects = {
+            bounds: bounds,
+            controlledShip: ship
+        };
 
-        this.objects.controlledShip = ship;
+        return this;
+    };
 
-        this.objects.uncontrolledShip = new Ship(this.ctx, {
-            coords: [ 200, 200 ],
-            color: [ 200, 100, 100 ],
-            size: 20
+    /**
+     * Initializes event listeners
+     */
+    App.prototype.initEvents = function() {
+        var self = this;
+
+        this.objects.controlledShip.on('shift', function(data) {
+            this.socket.emit('shift', _.extend(data, { id: this.id }));
+        }, this.objects.controlledShip);
+
+        this.socket.on('create', function(data) {
+            var ship = new Ship(self.ctx, {
+                color: [ 200, 100, 100 ]
+            });
+
+            ship.id = data.id;
+
+            self.objects['ship:' + ship.id] = ship;
+        });
+
+        this.socket.on('remove', function(data) {
+            delete self.objects['ship:' + data.id];
+        });
+
+        this.socket.on('shift', function(data) {
+            self.objects['ship:' + data.id].trigger('shift', data);
         });
 
         return this;

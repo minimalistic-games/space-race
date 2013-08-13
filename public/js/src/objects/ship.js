@@ -33,14 +33,14 @@ define([
     };
 
     Ship.prototype.render = function() {
-        var rectWidth = this.options.size / Math.sqrt(2),
+        var rectWidth = this.size / Math.sqrt(2),
             directionAngles = {
                 Right: 0,
                 Up: - Math.PI * 0.5,
                 Left: - Math.PI,
                 Down: - Math.PI * 1.5
             },
-            frontAngle = Math.PI * 0.5 + this.size * this.size / 10000,
+            frontAngle = Math.PI * 0.4 + this.size * this.size / 10000,
             getRectCoord = function(coord, size) { return coord - size / 2; };
 
         this.ctx.fillStyle = 'rgba(' + this.color.join(',') + ',' + this.options.opacity + ')';
