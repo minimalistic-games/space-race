@@ -7,8 +7,8 @@ define([
         _.extend(this, Events);
 
         this.domEvents = {
-            'keydown': this.handleKeyDown,
-            'keyup': this.handleKeyUp
+            'keydown': this.handleKey,
+            'keyup': this.handleKey
         };
         this.attachedDomEvents = {};
     };
@@ -33,23 +33,15 @@ define([
         return this;
     };
 
-    Controllable.prototype.handleKeyDown = function(e) {
+    Controllable.prototype.handleKey = function(e) {
         var key = e.keyIdentifier;
         if (!_.contains([ 'Up', 'Right', 'Down', 'Left' ], key)) { return; }
 
         this.trigger('shift', {
             axis: +_.contains([ 'Up', 'Down' ], key),
-            isPositive: _.contains([ 'Down', 'Right' ], key)
+            isPositive: _.contains([ 'Down', 'Right' ], key),
+            toStop: 'keyup' == e.type
         });
-
-        return this;
-    };
-
-    Controllable.prototype.handleKeyUp = function(e) {
-        var key = e.keyIdentifier;
-        if (!_.contains([ 'Up', 'Right', 'Down', 'Left' ], key)) { return; }
-
-        this.trigger('stop');
 
         return this;
     };

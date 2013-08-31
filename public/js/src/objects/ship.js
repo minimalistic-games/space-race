@@ -27,7 +27,9 @@ define([
 
         this.color = this.options.color;
 
-        this.direction = 'Up';
+        this.direction = 'up';
+
+        this.moveIntervalIds = { up: null, down: null, left: null, right: null };
 
         this.initEvents();
     };
@@ -35,10 +37,10 @@ define([
     Ship.prototype.render = function() {
         var rectWidth = this.size / Math.sqrt(2),
             directionAngles = {
-                Right: 0,
-                Up: - Math.PI * 0.5,
-                Left: - Math.PI,
-                Down: - Math.PI * 1.5
+                right: 0,
+                up: - Math.PI * 0.5,
+                left: - Math.PI,
+                down: - Math.PI * 1.5
             },
             frontAngle = Math.PI * 0.4 + this.size * this.size / 10000,
             getRectCoord = function(coord, size) { return coord - size / 2; };
@@ -76,6 +78,13 @@ define([
         return this;
     };
 
+    Ship.prototype.changeColor = function() {
+        _.each(this.color, function(value, index) {
+            var randomSign = Math.round(Math.random() * 2) - 1;
+            this.color[index] = Math.min(100, this.color[index] + randomSign * 40);
+        }, this);
+    };
+
     Ship.prototype.initEvents = function() {
         var resizingStep = 2,
             shiftCoord = function(coord, step, isPositive) {
@@ -83,11 +92,36 @@ define([
             };
 
         this.on('shift', function(data) {
-            var coords = this.coords;
-            coords[data.axis] = shiftCoord(coords[data.axis], this.options.step, data.isPositive);
-            this.move(coords);
+            var direction = [
+                [ 'left' , 'right' ],
+                [ 'up' , 'down' ]
+            ] [data.axis][+data.isPositive];
 
-            this.direction = [ [ 'Left' , 'Right' ], [ 'Up' , 'Down' ] ] [data.axis][+data.isPositive];
+            if (data.toStop) {
+                window.clearInterval(this.moveIntervalIds[direction]);
+                this.moveIntervalIds[direction] = null;
+                return;
+            }
+
+            this.direction = direction;
+
+            /*
+             * skipping an event if ship is already moving in current direction
+             */
+            if (this.moveIntervalIds[direction]) { return; }
+
+            var self = this;
+            this.moveIntervalIds[direction] = window.setInterval(function() {
+                var coords = self.coords;
+                coords[data.axis] = shiftCoord(coords[data.axis], self.options.step, data.isPositive);
+                self.move(coords);
+            }, 20);
+        });
+
+        this.on('shift', function(data) {
+            if (data.toStop) {
+                this.changeColor();
+            }
         });
 
         this.on('render', function() {
@@ -97,14 +131,7 @@ define([
         });
 
         this.on('move', function() {
-            this.size += resizingStep * 4;
-        });
-
-        this.on('stop', function() {
-            _.each(this.color, function(value, index) {
-                var randomSign = Math.round(Math.random() * 2) - 1;
-                this.color[index] = Math.min(100, this.color[index] + randomSign * 40);
-            }, this);
+            this.size += resizingStep * 2;
         });
 
         return this;
