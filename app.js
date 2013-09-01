@@ -1,4 +1,5 @@
-var express = require('express'),
+var _ = require('underscore'),
+    express = require('express'),
     app = express(),
     server = require('http').createServer(app),
     io = require('socket.io').listen(server);
@@ -13,19 +14,40 @@ app.get('/', function(req, res){
     res.sendfile(__dirname + '/public/index.html');
 });
 
-var idCounter = 1;
+var Ship = function(id, coords) {
+    this.id = id;
+    this.coords = coords || [ 200, 200 ];
+};
+
+/*
+ * ships registry { id: Ship }
+ */
+var ships = {};
 
 io.sockets.on('connection', function(socket) {
     var id = null;
 
     socket.on('identify', function(data) {
-        id = data.id ? data.id : idCounter++;
+        id = data.id || _.max(_.keys(ships)) + 1;
 
-        socket.emit('register', { id: id });
-        socket.broadcast.emit('create', { id: id });
+        var ship = new Ship(id, data.coords);
+
+        ships[id] = ship;
+
+        socket.emit('register', ship);
+
+        socket.broadcast.emit('create', ship);
+
+        _.each(ships, function(ship) {
+            if (id != ship.id) {
+                socket.emit('create', ship);
+            }
+        });
     });
 
     socket.on('disconnect', function() {
+        delete ships[id];
+
         socket.broadcast.emit('remove', { id: id });
     });
 

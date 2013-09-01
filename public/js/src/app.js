@@ -47,24 +47,39 @@ define([
     };
 
     /**
-     * Creates one controlled ship
+     * Creates one controlled ship and canvas bounds
      */
     App.prototype.addInitialObjects = function() {
-        var bounds = new Bounds(this.ctx, { color: [ 100, 150, 200 ], width: 10 }),
-            ship = new Ship(this.ctx, { color: [ 50, 50, 250 ] }),
-            controllable = new Controllable(),
-            identifiable = new Identifiable(this.socket);
+        var ship = new Ship(this.ctx, { color: [ 50, 50, 250 ] });
 
-        _.extend(ship, controllable, identifiable);
+        _.extend(ship, new Controllable(), new Identifiable(this.socket));
 
         ship
             .toggleDomEvents(true)
-            .identify('controlledShip:id');
+            .identify('controlledShip:id')
+            .on('register', function(data) {
+                ship.id = data.id;
+                ship.coords = data.coords;
 
-        this.objects = {
-            bounds: bounds,
-            controlledShip: ship
-        };
+                this.objects.controlledShip = ship;
+            }, this)
+            .on('shift', function(data) {
+                /*
+                 * notifying server about shifting
+                 * using NOT "move" but "shift", because only "shift" event comes with comprehensive data
+                 */
+                this.socket.emit('shift', _.extend(data, { id: ship.id }));
+            }, this)
+            .on('shift', function(data) {
+                if (data.toStop) {
+                    ship.changeColor();
+                }
+            });
+
+        this.objects.bounds = new Bounds(this.ctx, {
+            color: [ 100, 150, 200 ],
+            width: 10
+        });
 
         return this;
     };
@@ -75,13 +90,13 @@ define([
     App.prototype.initEvents = function() {
         var self = this;
 
-        this.objects.controlledShip.on('shift', function(data) {
-            this.socket.emit('shift', _.extend(data, { id: this.id }));
-        }, this.objects.controlledShip);
-
+        /*
+         * handling creation of other ships
+         */
         this.socket.on('create', function(data) {
             var ship = new Ship(self.ctx, {
-                color: [ 200, 100, 100 ]
+                color: [ 200, 100, 100 ],
+                coords: data.coords
             });
 
             ship.id = data.id;
@@ -89,10 +104,16 @@ define([
             self.objects['ship:' + ship.id] = ship;
         });
 
+        /*
+         * removing disconnected ships
+         */
         this.socket.on('remove', function(data) {
             delete self.objects['ship:' + data.id];
         });
 
+        /*
+         * handling shifts of other ships
+         */
         this.socket.on('shift', function(data) {
             self.objects['ship:' + data.id].trigger('shift', data);
         });

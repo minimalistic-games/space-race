@@ -21,7 +21,7 @@ define([
         /*
          * coords of object's center
          */
-        this.coords = [ this.options.coords[0], this.options.coords[1] ];
+        this.coords = this.options.coords;
 
         this.size = this.options.size;
 
@@ -86,11 +86,6 @@ define([
     };
 
     Ship.prototype.initEvents = function() {
-        var resizingStep = 2,
-            shiftCoord = function(coord, step, isPositive) {
-                return isPositive ? coord + step : coord - step;
-            };
-
         this.on('shift', function(data) {
             var direction = [
                 [ 'left' , 'right' ],
@@ -113,25 +108,19 @@ define([
             var self = this;
             this.moveIntervalIds[direction] = window.setInterval(function() {
                 var coords = self.coords;
-                coords[data.axis] = shiftCoord(coords[data.axis], self.options.step, data.isPositive);
+                coords[data.axis] += self.options.step * (data.isPositive ? 1 : -1);
                 self.move(coords);
             }, 20);
         });
 
-        this.on('shift', function(data) {
-            if (data.toStop) {
-                this.changeColor();
-            }
-        });
-
         this.on('render', function() {
             if (this.size > this.options.size) {
-                this.size -= resizingStep;
+                this.size -= 2;
             }
         });
 
         this.on('move', function() {
-            this.size += resizingStep * 2;
+            this.size += 4;
         });
 
         return this;

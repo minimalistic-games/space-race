@@ -13,14 +13,15 @@ define([
      * @param string idStorageKey An id key for localStorage
      */
     Identifiable.prototype.identify = function(idStorageKey) {
-        this.id = window.localStorage.getItem(idStorageKey);
+        var id = window.localStorage.getItem(idStorageKey);
 
-        this.socket.emit('identify', { id: this.id });
+        this.socket.emit('identify', { id: id });
 
         var self = this;
         this.socket.on('register', function(data) {
-            self.id = data.id;
-            window.localStorage.setItem(idStorageKey, self.id);
+            window.localStorage.setItem(idStorageKey, data.id);
+
+            self.trigger('register', data);
         });
 
         return this;

@@ -4,6 +4,7 @@
     "version": "0.0.0",
     "private": true,
     "dependencies": {
+        "underscore": "",
         "express": "3.x",
         "socket.io": ""
     }
