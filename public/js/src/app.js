@@ -40,7 +40,7 @@ define([
     App.prototype.init = function() {
         this
             .addInitialObjects()
-            .initEvents()
+            .listenServer()
             .startDrawingLoop();
 
         return this;
@@ -64,17 +64,16 @@ define([
                 this.objects.controlledShip = ship;
             }, this)
             .on('shift', function(data) {
-                /*
-                 * notifying server about shifting
-                 * using NOT "move" but "shift", because only "shift" event comes with comprehensive data
-                 */
-                this.socket.emit('shift', _.extend(data, { id: ship.id }));
+                this.socket.emit('shift', data);
             }, this)
             .on('shift', function(data) {
                 if (data.toStop) {
                     ship.changeColor();
                 }
-            });
+            })
+            .on('move', function(data) {
+                this.socket.emit('move', data);
+            }, this);
 
         this.objects.bounds = new Bounds(this.ctx, {
             color: [ 100, 150, 200 ],
@@ -87,7 +86,7 @@ define([
     /**
      * Initializes event listeners
      */
-    App.prototype.initEvents = function() {
+    App.prototype.listenServer = function() {
         var self = this;
 
         /*
