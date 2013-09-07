@@ -2,7 +2,8 @@ var _ = require('underscore'),
     express = require('express'),
     app = express(),
     server = require('http').createServer(app),
-    io = require('socket.io').listen(server);
+    io = require('socket.io').listen(server),
+    Ship = require('./server/objects/ship').Ship;
 
 app.use(express.compress());
 
@@ -13,26 +14,6 @@ app.use(express.logger());
 app.get('/', function(req, res) {
     res.sendfile(__dirname + '/public/index.html');
 });
-
-var Ship = function(id) {
-    this.id = id;
-
-    this.coords = [ 200, 200 ];
-    this.isActive = true;
-};
-
-Ship.prototype.move = function(coords) {
-    this.coords = coords;
-
-    return this;
-}
-
-Ship.prototype.toClientData = function() {
-    return {
-        id: this.id,
-        coords: this.coords
-    };
-};
 
 /*
  * ships registry { id: Ship }
