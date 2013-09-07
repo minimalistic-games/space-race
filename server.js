@@ -47,7 +47,9 @@ io.sockets.on('connection', function(socket) {
     });
 
     socket.on('disconnect', function() {
-        ships[id].isActive = false;
+        if (ships[id]) {
+            ships[id].isActive = false;
+        }
 
         socket.broadcast.emit('remove', { id: id });
     });

@@ -3,16 +3,18 @@ define([
 ], function(Events) {
     "use strict";
 
-    var Ship = function(ctx, options) {
+    var Ship = function(ctx, bounds, options) {
         _.extend(this, Events);
 
         this.ctx = ctx;
+
+        this.bounds = bounds;
 
         this.options = _.extend({
             color: [ 0, 0, 0 ],
             opacity: 0.4,
             coords: [ 100, 100 ],
-            size: 20,
+            size: 40,
             step: 4
         }, options);
 
@@ -78,11 +80,41 @@ define([
         return this;
     };
 
+    Ship.prototype.isMoving = function() {
+        for (var direction in this.moveIntervalIds) {
+            if (this.moveIntervalIds[direction]) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
     Ship.prototype.changeColor = function() {
         _.each(this.color, function(value, index) {
             var randomSign = Math.round(Math.random() * 2) - 1;
-            this.color[index] = Math.min(100, this.color[index] + randomSign * 40);
+            this.color[index] = Math.min(100, this.color[index] + randomSign * 10);
         }, this);
+    };
+
+    Ship.prototype.isFacingBounds = function() {
+        var radius = this.options.size / 2;
+
+        /*
+         * @todo: wix a bug with crossing a bound on "multi-directional" moves
+         */
+        switch (this.direction) {
+            case 'left':
+                return this.coords[0] <= radius + this.bounds.thickness;
+            case 'right':
+                return this.coords[0] >= this.bounds.width - radius - this.bounds.thickness;
+            case 'up':
+                return this.coords[1] <= radius + this.bounds.thickness;
+            case 'down':
+                return this.coords[1] >= this.bounds.height - radius - this.bounds.thickness;
+        }
+
+        return false;
     };
 
     Ship.prototype.initEvents = function() {
@@ -95,6 +127,11 @@ define([
             if (data.toStop) {
                 window.clearInterval(this.moveIntervalIds[direction]);
                 this.moveIntervalIds[direction] = null;
+
+                if (!this.isMoving()) {
+                    this.trigger('stop');
+                }
+
                 return;
             }
 
@@ -107,9 +144,11 @@ define([
 
             var self = this;
             this.moveIntervalIds[direction] = window.setInterval(function() {
-                var coords = self.coords;
-                coords[data.axis] += self.options.step * (data.isPositive ? 1 : -1);
-                self.move(coords);
+                if (!self.isFacingBounds()) {
+                    var coords = self.coords;
+                    coords[data.axis] += self.options.step * (data.isPositive ? 1 : -1);
+                    self.move(coords);
+                }
             }, 20);
         });
 
