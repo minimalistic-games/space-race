@@ -93,7 +93,7 @@ define([
          * handling creation of other ships
          */
         this.socket.on('create', function(data) {
-            var ship = new Ship(self.ctx, {
+            var ship = new Ship(self.ctx, self.objects.bounds, {
                 color: [ 200, 100, 100 ],
                 coords: data.coords
             });

@@ -102,6 +102,7 @@ define([
 
         /*
          * @todo: wix a bug with crossing a bound on "multi-directional" moves
+         * we need to handle multiple directions with a "this.directions = {}" property
          */
         switch (this.direction) {
             case 'left':
@@ -113,8 +114,6 @@ define([
             case 'down':
                 return this.coords[1] >= this.bounds.height - radius - this.bounds.thickness;
         }
-
-        return false;
     };
 
     Ship.prototype.initEvents = function() {
