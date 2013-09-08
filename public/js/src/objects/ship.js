@@ -29,9 +29,7 @@ define([
 
         this.color = this.options.color;
 
-        this.direction = 'up';
-
-        this.moveIntervalIds = { up: null, down: null, left: null, right: null };
+        this.directionsMoveIntervals = { up: null, down: null, left: null, right: null };
 
         this.initEvents();
     };
@@ -44,7 +42,7 @@ define([
                 left: - Math.PI,
                 down: - Math.PI * 1.5
             },
-            frontAngle = Math.PI * 0.4 + this.size * this.size / 10000,
+            frontAngle = Math.PI * 0.4,
             getRectCoord = function(coord, size) { return coord - size / 2; };
 
         this.ctx.fillStyle = 'rgba(' + this.color.join(',') + ',' + this.options.opacity + ')';
@@ -56,16 +54,20 @@ define([
             rectWidth
         );
 
-        this.ctx.beginPath();
-        this.ctx.arc(
-            this.coords[0],
-            this.coords[1],
-            this.size / 2,
-            frontAngle / 2 + directionAngles[this.direction],
-            - frontAngle / 2 + directionAngles[this.direction],
-            true
-        );
-        this.ctx.fill();
+        for (var direction in this.directionsMoveIntervals) {
+            if (this.directionsMoveIntervals[direction]) {
+                this.ctx.beginPath();
+                this.ctx.arc(
+                    this.coords[0],
+                    this.coords[1],
+                    this.size / 2,
+                    frontAngle / 2 + directionAngles[direction],
+                    - frontAngle / 2 + directionAngles[direction],
+                    true
+                );
+                this.ctx.fill();
+            }
+        }
 
         this.trigger('render');
 
@@ -81,8 +83,8 @@ define([
     };
 
     Ship.prototype.isMoving = function() {
-        for (var direction in this.moveIntervalIds) {
-            if (this.moveIntervalIds[direction]) {
+        for (var direction in this.directionsMoveIntervals) {
+            if (this.directionsMoveIntervals[direction]) {
                 return true;
             }
         }
@@ -97,14 +99,10 @@ define([
         }, this);
     };
 
-    Ship.prototype.isFacingBounds = function() {
+    Ship.prototype.isFacingBound = function(direction) {
         var radius = this.options.size / 2;
 
-        /*
-         * @todo: wix a bug with crossing a bound on "multi-directional" moves
-         * we need to handle multiple directions with a "this.directions = {}" property
-         */
-        switch (this.direction) {
+        switch (direction) {
             case 'left':
                 return this.coords[0] <= radius + this.bounds.thickness;
             case 'right':
@@ -124,8 +122,8 @@ define([
             ] [data.axis][+data.isPositive];
 
             if (data.toStop) {
-                window.clearInterval(this.moveIntervalIds[direction]);
-                this.moveIntervalIds[direction] = null;
+                window.clearInterval(this.directionsMoveIntervals[direction]);
+                this.directionsMoveIntervals[direction] = null;
 
                 if (!this.isMoving()) {
                     this.trigger('stop');
@@ -134,16 +132,17 @@ define([
                 return;
             }
 
-            this.direction = direction;
-
             /*
              * skipping an event if ship is already moving in current direction
              */
-            if (this.moveIntervalIds[direction]) { return; }
+            if (this.directionsMoveIntervals[direction]) { return; }
 
             var self = this;
-            this.moveIntervalIds[direction] = window.setInterval(function() {
-                if (!self.isFacingBounds()) {
+            this.directionsMoveIntervals[direction] = window.setInterval(function() {
+                /*
+                 * skipping a move if ship is facing a bound in current direction
+                 */
+                if (!self.isFacingBound(direction)) {
                     var coords = self.coords;
                     coords[data.axis] += self.options.step * (data.isPositive ? 1 : -1);
                     self.move(coords);
