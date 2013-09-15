@@ -29,7 +29,9 @@ define([
 
         this.color = this.options.color;
 
-        this.directionsMoveIntervals = { up: null, down: null, left: null, right: null };
+        this.moveIntervalDirections = { up: null, down: null, left: null, right: null };
+
+        this.shieldDirections = { up: false, down: false, left: false, right: false };
 
         this.initEvents();
     };
@@ -43,6 +45,7 @@ define([
                 down: - Math.PI * 1.5
             },
             frontAngle = Math.PI * 0.4,
+            shieldAngle = Math.PI * 0.7,
             getRectCoord = function(coord, size) { return coord - size / 2; };
 
         this.ctx.fillStyle = 'rgba(' + this.color.join(',') + ',' + this.options.opacity + ')';
@@ -54,15 +57,30 @@ define([
             rectWidth
         );
 
-        for (var direction in this.directionsMoveIntervals) {
-            if (this.directionsMoveIntervals[direction]) {
+        for (var moveDirection in this.moveIntervalDirections) {
+            if (this.moveIntervalDirections[moveDirection]) {
                 this.ctx.beginPath();
                 this.ctx.arc(
                     this.coords[0],
                     this.coords[1],
                     this.size / 2,
-                    frontAngle / 2 + directionAngles[direction],
-                    - frontAngle / 2 + directionAngles[direction],
+                    frontAngle / 2 + directionAngles[moveDirection],
+                    - frontAngle / 2 + directionAngles[moveDirection],
+                    true
+                );
+                this.ctx.fill();
+            }
+        }
+
+        for (var shieldDirection in this.shieldDirections) {
+            if (this.shieldDirections[shieldDirection]) {
+                this.ctx.beginPath();
+                this.ctx.arc(
+                    this.coords[0],
+                    this.coords[1],
+                    this.size * 0.8,
+                    shieldAngle / 2  + directionAngles[shieldDirection],
+                    - shieldAngle / 2  + directionAngles[shieldDirection],
                     true
                 );
                 this.ctx.fill();
@@ -82,9 +100,16 @@ define([
         return this;
     };
 
+    Ship.prototype.shift = function(axis, isPositive) {
+        var coords = this.coords;
+        coords[axis] += this.options.step * (isPositive ? 1 : -1);
+
+        return this.move(coords);
+    };
+
     Ship.prototype.isMoving = function() {
-        for (var direction in this.directionsMoveIntervals) {
-            if (this.directionsMoveIntervals[direction]) {
+        for (var direction in this.moveIntervalDirections) {
+            if (this.moveIntervalDirections[direction]) {
                 return true;
             }
         }
@@ -114,6 +139,26 @@ define([
         }
     };
 
+    Ship.prototype.toggleShield = function(toProceed) {
+        for (var direction in this.shieldDirections) {
+            if (!toProceed) {
+                this.shieldDirections[direction] = false;
+                continue;
+            }
+
+            if (this.shieldDirections[direction]) {
+                continue;
+            }
+
+            /*
+             * A shield can be activated only while moving along current directions
+             */
+            this.shieldDirections[direction] = !!this.moveIntervalDirections[direction];
+        }
+
+        return this;
+    };
+
     Ship.prototype.initEvents = function() {
         this.on('shift', function(data) {
             var direction = [
@@ -122,8 +167,8 @@ define([
             ] [data.axis][+data.isPositive];
 
             if (data.toStop) {
-                window.clearInterval(this.directionsMoveIntervals[direction]);
-                this.directionsMoveIntervals[direction] = null;
+                window.clearInterval(this.moveIntervalDirections[direction]);
+                this.moveIntervalDirections[direction] = null;
 
                 if (!this.isMoving()) {
                     this.trigger('stop');
@@ -135,17 +180,15 @@ define([
             /*
              * skipping an event if ship is already moving in current direction
              */
-            if (this.directionsMoveIntervals[direction]) { return; }
+            if (this.moveIntervalDirections[direction]) { return; }
 
             var self = this;
-            this.directionsMoveIntervals[direction] = window.setInterval(function() {
+            this.moveIntervalDirections[direction] = window.setInterval(function() {
                 /*
                  * skipping a move if ship is facing a bound in current direction
                  */
                 if (!self.isFacingBound(direction)) {
-                    var coords = self.coords;
-                    coords[data.axis] += self.options.step * (data.isPositive ? 1 : -1);
-                    self.move(coords);
+                    self.shift(data.axis, data.isPositive);
                 }
             }, 20);
         });
@@ -158,6 +201,10 @@ define([
 
         this.on('move', function() {
             this.size += 4;
+        });
+
+        this.on('shield', function(data) {
+            this.toggleShield(!data.toStop);
         });
 
         return this;

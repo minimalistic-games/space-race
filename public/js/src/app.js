@@ -56,7 +56,7 @@ define([
         });
         this.objects.bounds = bounds;
 
-        var ship = new Ship(this.ctx, bounds, { color: [ 50, 50, 250 ] });
+        var ship = new Ship(this.ctx, bounds, { color: [ 50, 50, 50 ] });
         _.extend(ship, new Controllable(), new Identifiable(this.socket));
 
         ship
@@ -71,11 +71,7 @@ define([
             .on('shift', function(data) {
                 this.socket.emit('shift', data);
             }, this)
-            .on('shift', function(data) {
-                if (data.toStop) {
-                    ship.changeColor();
-                }
-            })
+            .on('stop', ship.changeColor)
             .on('move', function(data) {
                 this.socket.emit('move', data);
             }, this);

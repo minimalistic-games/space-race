@@ -35,15 +35,19 @@ define([
 
     Controllable.prototype.handleKey = function(e) {
         var key = e.keyIdentifier;
-        if (!_.contains([ 'Up', 'Right', 'Down', 'Left' ], key)) { return; }
+        if (!_.contains([ 'Up', 'Right', 'Down', 'Left', 'U+0020' ], key)) { return; }
 
-        this.trigger('shift', {
+        if ('U+0020' == key) {
+            return this.trigger('shield', {
+                toStop: 'keyup' == e.type
+            });
+        }
+
+        return this.trigger('shift', {
             axis: +_.contains([ 'Up', 'Down' ], key),
             isPositive: _.contains([ 'Down', 'Right' ], key),
             toStop: 'keyup' == e.type
         });
-
-        return this;
     };
 
     return Controllable;
