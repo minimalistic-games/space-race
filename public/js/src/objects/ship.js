@@ -1,12 +1,13 @@
 define([
-    'events'
-], function(Events) {
+    'events',
+    'views/ship'
+], function(Events, ShipView) {
     "use strict";
 
     var Ship = function(ctx, bounds, options) {
         _.extend(this, Events);
 
-        this.ctx = ctx;
+        this.view = new ShipView(ctx);
 
         this.bounds = bounds;
 
@@ -29,65 +30,40 @@ define([
 
         this.color = this.options.color;
 
+        /*
+         * time interval for performing moves, ms
+         */
+        this.interval = 20;
+
         this.moveIntervalDirections = { up: null, down: null, left: null, right: null };
 
         this.shieldDirections = { up: false, down: false, left: false, right: false };
 
         this.initEvents();
+
+        var self = this;
+        window.setInterval(function() {
+            self.trigger('beat');
+        }, this.interval);
     };
 
     Ship.prototype.render = function() {
-        var rectWidth = this.size / Math.sqrt(2),
-            directionAngles = {
-                right: 0,
-                up: - Math.PI * 0.5,
-                left: - Math.PI,
-                down: - Math.PI * 1.5
-            },
-            frontAngle = Math.PI * 0.4,
-            shieldAngle = Math.PI * 0.7,
-            getRectCoord = function(coord, size) { return coord - size / 2; };
-
-        this.ctx.fillStyle = 'rgba(' + this.color.join(',') + ',' + this.options.opacity + ')';
-
-        this.ctx.fillRect(
-            getRectCoord(this.coords[0], rectWidth),
-            getRectCoord(this.coords[1], rectWidth),
-            rectWidth,
-            rectWidth
-        );
+        this.view
+            .setColor(this.color, this.options.opacity)
+            .drawBody(this.coords, this.options.size / Math.sqrt(2))
+            .drawBody(this.coords, this.size / Math.sqrt(2));
 
         for (var moveDirection in this.moveIntervalDirections) {
             if (this.moveIntervalDirections[moveDirection]) {
-                this.ctx.beginPath();
-                this.ctx.arc(
-                    this.coords[0],
-                    this.coords[1],
-                    this.size / 2,
-                    frontAngle / 2 + directionAngles[moveDirection],
-                    - frontAngle / 2 + directionAngles[moveDirection],
-                    true
-                );
-                this.ctx.fill();
+                this.view.drawFrontArc(this.coords, this.size / 2, Math.PI * 0.4, moveDirection);
             }
         }
 
         for (var shieldDirection in this.shieldDirections) {
             if (this.shieldDirections[shieldDirection]) {
-                this.ctx.beginPath();
-                this.ctx.arc(
-                    this.coords[0],
-                    this.coords[1],
-                    this.size * 0.8,
-                    shieldAngle / 2  + directionAngles[shieldDirection],
-                    - shieldAngle / 2  + directionAngles[shieldDirection],
-                    true
-                );
-                this.ctx.fill();
+                this.view.drawFrontArc(this.coords, this.size * 0.8, Math.PI * 0.7, shieldDirection);
             }
         }
-
-        this.trigger('render');
 
         return this;
     };
@@ -190,17 +166,17 @@ define([
                 if (!self.isFacingBound(direction)) {
                     self.shift(data.axis, data.isPositive);
                 }
-            }, 20);
+            }, this.interval);
         });
 
-        this.on('render', function() {
-            if (this.size > this.options.size) {
-                this.size -= 2;
+        this.on('beat', function() {
+            if (!this.isMoving()) {
+                if (this.size > this.options.size) {
+                    this.size -= 2;
+                }
+            } else if (this.size < this.options.size * 4) {
+                this.size += 4;
             }
-        });
-
-        this.on('move', function() {
-            this.size += 4;
         });
 
         this.on('shield', function(data) {

@@ -10,7 +10,16 @@ define([
             'keydown': this.handleKey,
             'keyup': this.handleKey
         };
+
         this.attachedDomEvents = {};
+
+        this.keys = {
+            up: 'Up',
+            down: 'Down',
+            left: 'Left',
+            right: 'Right',
+            space: 'U+0020'
+        };
     };
 
     Controllable.prototype.destroy = function() {
@@ -24,7 +33,9 @@ define([
              * storing binded event handlers to be able to detach them by reference
              */
             if (toAttach) {
-                self.attachedDomEvents[type] = function(e) { return handler.call(self, e); };
+                self.attachedDomEvents[type] = function(e) {
+                    return handler.call(self, e);
+                };
             }
 
             document[toAttach ? 'addEventListener' : 'removeEventListener'](type, self.attachedDomEvents[type], false);
@@ -35,17 +46,17 @@ define([
 
     Controllable.prototype.handleKey = function(e) {
         var key = e.keyIdentifier;
-        if (!_.contains([ 'Up', 'Right', 'Down', 'Left', 'U+0020' ], key)) { return; }
+        if (!_.contains(this.keys, key)) { return; }
 
-        if ('U+0020' == key) {
+        if (this.keys.space == key) {
             return this.trigger('shield', {
                 toStop: 'keyup' == e.type
             });
         }
 
         return this.trigger('shift', {
-            axis: +_.contains([ 'Up', 'Down' ], key),
-            isPositive: _.contains([ 'Down', 'Right' ], key),
+            axis: +_.contains([ this.keys.up, this.keys.down ], key),
+            isPositive: _.contains([ this.keys.down, this.keys.right ], key),
             toStop: 'keyup' == e.type
         });
     };

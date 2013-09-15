@@ -90,7 +90,7 @@ define([
          */
         this.socket.on('create', function(data) {
             var ship = new Ship(self.ctx, self.objects.bounds, {
-                color: [ 200, 100, 100 ],
+                color: [ 100, 100, 100 ],
                 coords: data.coords
             });
 
