@@ -16,7 +16,8 @@ define([
             opacity: 0.4,
             coords: [ 100, 100 ],
             size: 40,
-            step: 4
+            movingStep: 4,
+            resizingStep: 2
         }, options);
 
         this.id = null;
@@ -26,44 +27,65 @@ define([
          */
         this.coords = this.options.coords;
 
+        /*
+         * diameter [px]
+         */
         this.size = this.options.size;
 
+        /*
+         * [ red, green. blue ]
+         */
         this.color = this.options.color;
 
         /*
-         * time interval for performing moves, ms
+         * time interval for performing moves [ms]
          */
-        this.interval = 20;
+        this.interval = 10;
 
         this.moveIntervalDirections = { up: null, down: null, left: null, right: null };
 
         this.shieldDirections = { up: false, down: false, left: false, right: false };
 
-        this.initEvents();
-
-        var self = this;
-        window.setInterval(function() {
-            self.trigger('beat');
-        }, this.interval);
+        this
+            .initEvents()
+            .runBeating();
     };
 
     Ship.prototype.render = function() {
+        /*
+         * draw both static and dynamic bodies
+         */
         this.view
             .setColor(this.color, this.options.opacity)
             .drawBody(this.coords, this.options.size / Math.sqrt(2))
             .drawBody(this.coords, this.size / Math.sqrt(2));
 
+        /*
+         * draw a front arc for each moving direction
+         */
         for (var moveDirection in this.moveIntervalDirections) {
             if (this.moveIntervalDirections[moveDirection]) {
                 this.view.drawFrontArc(this.coords, this.size / 2, Math.PI * 0.4, moveDirection);
             }
         }
 
+        /*
+         * draw shields (directions are set on turning shields on)
+         */
         for (var shieldDirection in this.shieldDirections) {
             if (this.shieldDirections[shieldDirection]) {
                 this.view.drawFrontArc(this.coords, this.size * 0.8, Math.PI * 0.7, shieldDirection);
             }
         }
+
+        return this;
+    };
+
+    Ship.prototype.runBeating = function() {
+        var self = this;
+        window.setInterval(function() {
+            self.trigger('beat');
+        }, this.interval);
 
         return this;
     };
@@ -78,7 +100,7 @@ define([
 
     Ship.prototype.shift = function(axis, isPositive) {
         var coords = this.coords;
-        coords[axis] += this.options.step * (isPositive ? 1 : -1);
+        coords[axis] += this.options.movingStep * (isPositive ? 1 : -1);
 
         return this.move(coords);
     };
@@ -98,6 +120,8 @@ define([
             var randomSign = Math.round(Math.random() * 2) - 1;
             this.color[index] = Math.min(100, this.color[index] + randomSign * 10);
         }, this);
+
+        return this;
     };
 
     Ship.prototype.isFacingBound = function(direction) {
@@ -130,6 +154,18 @@ define([
              * A shield can be activated only while moving along current directions
              */
             this.shieldDirections[direction] = !!this.moveIntervalDirections[direction];
+        }
+
+        return this;
+    };
+
+    Ship.prototype.resize = function() {
+        if (!this.isMoving()) {
+            if (this.size > this.options.size) {
+                this.size -= this.options.resizingStep * 2;
+            }
+        } else if (this.size < this.options.size * 4) {
+            this.size += this.options.resizingStep;
         }
 
         return this;
@@ -169,15 +205,7 @@ define([
             }, this.interval);
         });
 
-        this.on('beat', function() {
-            if (!this.isMoving()) {
-                if (this.size > this.options.size) {
-                    this.size -= 2;
-                }
-            } else if (this.size < this.options.size * 4) {
-                this.size += 4;
-            }
-        });
+        this.on('beat', this.resize);
 
         this.on('shield', function(data) {
             this.toggleShield(!data.toStop);
