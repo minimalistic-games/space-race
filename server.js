@@ -3,7 +3,7 @@ var _ = require('underscore'),
     app = express(),
     server = require('http').createServer(app),
     io = require('socket.io').listen(server),
-    Ship = require('./server/objects/ship').Ship;
+    Ship = require('./server/objects/ship');
 
 app.use(express.compress());
 

@@ -9,7 +9,7 @@ Ship.prototype.move = function(coords) {
     this.coords = coords;
 
     return this;
-}
+};
 
 Ship.prototype.toClientData = function() {
     return {
@@ -18,4 +18,4 @@ Ship.prototype.toClientData = function() {
     };
 };
 
-exports.Ship = Ship;
+module.exports = Ship;
