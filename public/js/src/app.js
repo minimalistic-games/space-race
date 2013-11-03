@@ -68,13 +68,9 @@ define([
 
                 this.objects.controlledShip = ship;
             }, this)
-            .on('shift', function(data) {
-                this.socket.emit('shift', data);
-            }, this)
+            .on('shift', function(data) { this.socket.emit('shift', data); }, this)
             .on('stop', ship.changeColor)
-            .on('move', function(data) {
-                this.socket.emit('move', data);
-            }, this);
+            .on('move', function(data) { this.socket.emit('move', data); }, this);
 
         return this;
     };

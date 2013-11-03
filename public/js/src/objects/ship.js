@@ -1,7 +1,8 @@
 define([
     'events',
-    'views/ship'
-], function(Events, ShipView) {
+    'views/ship',
+    'objects/bullet'
+], function(Events, ShipView, Bullet) {
     "use strict";
 
     var Ship = function(ctx, bounds, options) {
@@ -33,18 +34,31 @@ define([
         this.size = this.options.size;
 
         /*
-         * [ red, green. blue ]
+         * [ red, green, blue ]
          */
         this.color = this.options.color;
 
         /*
-         * time interval for performing moves [ms]
+         * time interval for running inner events [ms]
          */
         this.interval = 10;
 
         this.moveIntervalDirections = { up: null, down: null, left: null, right: null };
 
         this.shieldDirections = { up: false, down: false, left: false, right: false };
+
+        this.bulletsLimit = 100;
+
+        /*
+         * number of bullets in queue
+         * ship can't produce more bullets than this.bulletsLimit
+         */
+        this.bulletsInQueue = 0;
+
+        /*
+         * registry of bullets that a fired currently
+         */
+        this.bullets = [];
 
         this
             .initEvents()
@@ -78,7 +92,7 @@ define([
             }
         }
 
-        return this;
+        return this.trigger('render');
     };
 
     Ship.prototype.runBeating = function() {
@@ -171,6 +185,29 @@ define([
         return this;
     };
 
+    Ship.prototype.queueBullet = function() {
+        if (this.bulletsInQueue < this.bulletsLimit) {
+            this.bulletsInQueue++;
+        }
+
+        return this;
+    };
+
+    Ship.prototype.createBullet = function() {
+        this.bulletsInQueue--;
+
+        var directions = {};
+        for (var moveDirection in this.moveIntervalDirections) {
+            directions[moveDirection] = !!this.moveIntervalDirections[moveDirection];
+        }
+
+        this.bullets.push(new Bullet(this.view.ctx, directions, this.coords));
+
+        if (0 === this.bulletsInQueue) {
+            this.off('beat', this.createBullet);
+        }
+    };
+
     Ship.prototype.initEvents = function() {
         this.on('shift', function(data) {
             var direction = [
@@ -209,6 +246,20 @@ define([
 
         this.on('shield', function(data) {
             this.toggleShield(!data.toStop);
+        });
+
+        this.on('weapon', function(data) {
+            this[data.toFire ? 'off' : 'on']('beat', this.queueBullet);
+
+            if (data.toFire) {
+                this.on('beat', this.createBullet);
+            }
+        });
+
+        this.on('render', function() {
+            _.each(this.bullets, function(bullet) {
+                bullet.render();
+            });
         });
 
         return this;
