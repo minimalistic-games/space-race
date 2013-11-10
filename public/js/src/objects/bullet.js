@@ -3,12 +3,11 @@ define([
 ], function(Events) {
     "use strict";
 
-    var Bullet = function(ctx, coords, directions, options) {
+    var Bullet = function(ctx, coords, direction, options) {
         _.extend(this, Events);
 
-        this.coords = this.coords;
-
-        this.directions = this.directions;
+        this.coords = coords;
+        this.direction = direction;
 
         this.options = _.extend({
             color: [ 0, 0, 0 ],
@@ -18,11 +17,9 @@ define([
         }, options);
 
         this.size = this.options.size;
-
         this.color = this.options.color;
 
-        console.log(directions);
-        console.log(coords);
+        // console.log(this.direction);
     };
 
     Bullet.prototype.render = function() {

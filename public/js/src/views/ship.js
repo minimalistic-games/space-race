@@ -11,10 +11,31 @@ define([
             left: - Math.PI,
             down: - Math.PI * 1.5
         };
+
+        this.color = [ 0, 0, 0 ];
+        this.opacity = 1;
+
+        this.preset();
     };
 
-    ShipView.prototype.setColor = function(color, opacity) {
+    ShipView.prototype.preset = function() {
+        this.ctx.textAlign = 'end';
+        this.ctx.font = "12px sans-serif";
+
+        return this;
+    };
+
+    ShipView.prototype.applyColor = function(color, opacity) {
+        this.color = color;
+        this.opacity = opacity;
+
         this.ctx.fillStyle = 'rgba(' + color.join(',') + ',' + opacity + ')';
+
+        return this;
+    };
+
+    ShipView.prototype.text = function(coords, text) {
+        this.ctx.fillText(text, coords[0] + 10, coords[1] + 10);
 
         return this;
     };
@@ -45,6 +66,18 @@ define([
             true
         );
         this.ctx.fill();
+
+        return this;
+    };
+
+    ShipView.prototype.showBulletsInQueue = function(coords, number) {
+        var color = this.color,
+            opacity = this.opacity;
+
+        this
+            .applyColor([ 255, 255, 255 ], 0.4)
+            .text(coords, number || '')
+            .applyColor(color, opacity);
 
         return this;
     };

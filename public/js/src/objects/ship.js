@@ -70,7 +70,7 @@ define([
          * draw both static and dynamic bodies
          */
         this.view
-            .setColor(this.color, this.options.opacity)
+            .applyColor(this.color, this.options.opacity)
             .drawBody(this.coords, this.options.size / Math.sqrt(2))
             .drawBody(this.coords, this.size / Math.sqrt(2));
 
@@ -92,6 +92,8 @@ define([
             }
         }
 
+        this.view.showBulletsInQueue(this.coords, this.bulletsInQueue);
+
         return this.trigger('render');
     };
 
@@ -107,9 +109,7 @@ define([
     Ship.prototype.move = function(coords) {
         this.coords = coords;
 
-        this.trigger('move', { coords: this.coords });
-
-        return this;
+        return this.trigger('move', { coords: this.coords });
     };
 
     Ship.prototype.shift = function(axis, isPositive) {
@@ -193,19 +193,17 @@ define([
         return this;
     };
 
-    Ship.prototype.createBullet = function() {
-        this.bulletsInQueue--;
+    Ship.prototype.shot = function() {
+        for (var direction in this.moveIntervalDirections) {
+            if (!this.moveIntervalDirections[direction]) { continue; }
 
-        var directions = {};
-        for (var moveDirection in this.moveIntervalDirections) {
-            directions[moveDirection] = !!this.moveIntervalDirections[moveDirection];
+            if (!this.bulletsInQueue) { continue; }
+
+            this.bulletsInQueue--;
+            this.bullets.push(new Bullet(this.view.ctx, this.coords, direction));
         }
 
-        this.bullets.push(new Bullet(this.view.ctx, directions, this.coords));
-
-        if (0 === this.bulletsInQueue) {
-            this.off('beat', this.createBullet);
-        }
+        return this.trigger('shot');
     };
 
     Ship.prototype.initEvents = function() {
@@ -249,10 +247,24 @@ define([
         });
 
         this.on('weapon', function(data) {
+            /*
+             * start/stop charging a gun
+             */
             this[data.toFire ? 'off' : 'on']('beat', this.queueBullet);
 
             if (data.toFire) {
-                this.on('beat', this.createBullet);
+                /*
+                 * fire all bullets, one at a time
+                 */
+                this.on('beat', this.shot);
+                // console.log('fire starts');
+            }
+        });
+
+        this.on('shot', function() {
+            if (this.bulletsInQueue <= 0) {
+                this.off('beat', this.shot);
+                // console.log('fire stops');
             }
         });
 
