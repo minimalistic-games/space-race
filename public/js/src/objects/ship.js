@@ -171,7 +171,7 @@ define([
             /*
              * A shield can be activated only while moving along current directions
              */
-            this.shieldDirections[direction] = !!this.movingDirections[direction];
+            this.shieldDirections[direction] = this.movingDirections[direction];
         }
 
         return this;

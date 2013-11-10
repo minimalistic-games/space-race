@@ -32,17 +32,21 @@ io.sockets.on('connection', function(socket) {
     });
 
     socket.on('disconnect', function() {
+        if (!id) { return; }
+
         registry.remove(id);
 
         socket.broadcast.emit('remove', { id: id });
     });
 
     socket.on('shift', function(data) {
+        if (!id) { return; }
+
         socket.broadcast.emit('shift', _.extend(data, { id: id }));
     });
 
     socket.on('move', function(data) {
-        console.log(id);
+        if (!id) { return; }
 
         registry.get(id)
             .move(data.coords);

@@ -39,12 +39,10 @@ define([
      * Starts application
      */
     App.prototype.init = function() {
-        this
+        return this
             .addInitialObjects()
             .listenServer()
             .startDrawingLoop();
-
-        return this;
     };
 
     /**
