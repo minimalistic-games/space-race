@@ -1,19 +1,7 @@
 var _ = require('underscore'),
-    express = require('express'),
-    app = express(),
-    server = require('http').createServer(app),
-    io = require('socket.io').listen(server),
+    server = require('./server/server'),
+    io = require('socket.io').listen(server);
     Ship = require('./server/objects/ship');
-
-app.use(express.compress());
-
-app.use(express.static(__dirname + '/public'));
-
-app.use(express.logger());
-
-app.get('/', function(req, res) {
-    res.sendfile(__dirname + '/public/index.html');
-});
 
 /*
  * ships registry { id: Ship }
@@ -62,6 +50,3 @@ io.sockets.on('connection', function(socket) {
         ships[id].move(data.coords);
     });
 });
-
-server.listen(3000);
-console.log('Listening on port 3000');
