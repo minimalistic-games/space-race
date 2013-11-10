@@ -1,10 +1,11 @@
 define([
-    'underscore',
     'objects/bounds',
     'objects/ship',
     'behaviors/controllable',
-    'behaviors/identifiable'
-], function(_, Bounds, Ship, Controllable, Identifiable) {
+    'behaviors/identifiable',
+    'underscore',
+    'backbone'
+], function(Bounds, Ship, Controllable, Identifiable) {
     "use strict";
 
     var canvas = document.getElementById('canvas');
@@ -68,7 +69,7 @@ define([
 
                 this.objects.controlledShip = ship;
             }, this)
-            .on('shift', function(data) { this.socket.emit('shift', data); }, this)
+            .on('control:shift', function(data) { this.socket.emit('shift', data); }, this)
             .on('stop', ship.changeColor)
             .on('move', function(data) { this.socket.emit('move', data); }, this);
 
@@ -99,14 +100,20 @@ define([
          * removing disconnected ships
          */
         this.socket.on('remove', function(data) {
-            delete self.objects['ship:' + data.id];
+            var ship = self.objects['ship:' + data.id];
+
+            ship.destroy();
+
+            window.setTimeout(function() {
+                delete self.objects['ship:' + data.id];
+            }, 1000);
         });
 
         /*
          * handling shifts of other ships
          */
         this.socket.on('shift', function(data) {
-            self.objects['ship:' + data.id].trigger('shift', data);
+            self.objects['ship:' + data.id].trigger('control:shift', data);
         });
 
         return this;

@@ -1,10 +1,9 @@
 define([
-    'events'
-], function(Events) {
+], function() {
     "use strict";
 
     var Controllable = function() {
-        _.extend(this, Events);
+        _.extend(this, Backbone.Events);
 
         this.domEvents = {
             'keydown': this.handleKey,
@@ -23,9 +22,9 @@ define([
         };
     };
 
-    Controllable.prototype.destroy = function() {
-        return this.toggleDomEvents(false);
-    };
+    // Controllable.prototype.stopDomListeners = function() {
+    //     return this.toggleDomEvents(false);
+    // };
 
     Controllable.prototype.toggleDomEvents = function(toAttach) {
         var self = this;
@@ -50,16 +49,15 @@ define([
         if (!_.contains(this.keys, key)) { return; }
 
         if (this.keys.space == key) {
-            return this.trigger('shield', { toStop: 'keyup' == e.type });
+            return this.trigger('control:shield', { toStop: 'keyup' == e.type });
         }
 
         if (this.keys.ctrl == key) {
-            return this.trigger('weapon', { toFire: 'keyup' == e.type });
+            return this.trigger('control:weapon', { toFire: 'keyup' == e.type });
         }
 
-        return this.trigger('shift', {
-            axis: +_.contains([ this.keys.up, this.keys.down ], key),
-            isPositive: _.contains([ this.keys.down, this.keys.right ], key),
+        return this.trigger('control:shift', {
+            direction: _.invert(this.keys)[key],
             toStop: 'keyup' == e.type
         });
     };

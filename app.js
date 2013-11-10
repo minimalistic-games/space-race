@@ -1,43 +1,38 @@
 var _ = require('underscore'),
     server = require('./server/server'),
-    io = require('socket.io').listen(server);
-    Ship = require('./server/objects/ship');
+    io = require('socket.io').listen(server),
+    Ship = require('./server/objects/ship'),
+    Registry = require('./server/objects/registry');
 
-/*
- * ships registry { id: Ship }
- */
-var ships = {};
+var registry = new Registry(Ship);
 
 io.sockets.on('connection', function(socket) {
     var id = null;
 
     socket.on('identify', function(data) {
-        id = data.id || _.max(_.keys(ships)) + 1;
+        id = data.id;
 
-        var ship = ships[id];
+        var ship = registry.get(id);
 
         if (!ship) {
-            ship = new Ship(id);
-            ships[id] = ship;
+            ship = registry.create();
+            id = ship.id;
         }
-
-        ship.isActive = true;
 
         socket.emit('register', ship.toClientData());
 
         socket.broadcast.emit('create', ship.toClientData());
 
-        _.each(ships, function(ship) {
-            if (id != ship.id && ship.isActive) {
-                socket.emit('create', ship.toClientData());
+        _.each(
+            _.without(registry.all(), ship),
+            function(otherShip) {
+                socket.emit('create', otherShip.toClientData());
             }
-        });
+        );
     });
 
     socket.on('disconnect', function() {
-        if (ships[id]) {
-            ships[id].isActive = false;
-        }
+        registry.remove(id);
 
         socket.broadcast.emit('remove', { id: id });
     });
@@ -47,6 +42,9 @@ io.sockets.on('connection', function(socket) {
     });
 
     socket.on('move', function(data) {
-        ships[id].move(data.coords);
+        console.log(id);
+
+        registry.get(id)
+            .move(data.coords);
     });
 });

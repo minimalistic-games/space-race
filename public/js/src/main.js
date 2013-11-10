@@ -2,15 +2,16 @@ require.config({
     baseUrl: 'js/src',
     paths: {
         underscore: '../bower_components/underscore/underscore-min',
+        backbone: '../bower_components/backbone/backbone',
         events: 'backbone-events/backbone-events'
     },
     shim: {
         underscore: {
             exports: '_'
         },
-        events: {
+        backbone: {
             deps: [ 'underscore' ],
-            exports: 'Events'
+            exports: 'Backbone'
         },
         socketio: {
             exports: 'io'

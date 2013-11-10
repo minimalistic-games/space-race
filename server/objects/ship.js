@@ -1,8 +1,6 @@
 var Ship = function(id) {
     this.id = id;
-
     this.coords = [ 200, 200 ];
-    this.isActive = true;
 };
 
 Ship.prototype.move = function(coords) {

@@ -1,22 +1,25 @@
 define([
-    'events',
+    'behaviors/beating',
     'views/ship',
-    'objects/bullet'
-], function(Events, ShipView, Bullet) {
+    'objects/bullet',
+], function(Beating, ShipView, Bullet) {
     "use strict";
 
     var Ship = function(ctx, bounds, options) {
-        _.extend(this, Events);
-
+        /*
+         * a helper object to delegate partial rendering
+         */
         this.view = new ShipView(ctx);
 
+        /*
+         * map's bounds, should restrict a moving area
+         */
         this.bounds = bounds;
 
         this.options = _.extend({
-            color: [ 0, 0, 0 ],
-            opacity: 0.4,
             coords: [ 100, 100 ],
             size: 40,
+            color: [ 0, 0, 0 ],
             movingStep: 4,
             resizingStep: 2
         }, options);
@@ -38,14 +41,11 @@ define([
          */
         this.color = this.options.color;
 
-        /*
-         * time interval for running inner events [ms]
-         */
-        this.interval = 10;
+        this.opacity = 0.4;
 
-        this.moveIntervalDirections = { up: null, down: null, left: null, right: null };
+        this.movingDirections = { up: false, down: false, left: false, right: false };
 
-        this.shieldDirections = { up: false, down: false, left: false, right: false };
+        this.shieldDirections = _.clone(this.movingDirections);
 
         this.bulletsLimit = 100;
 
@@ -60,9 +60,11 @@ define([
          */
         this.bullets = [];
 
+        _.extend(this, Backbone.Events, new Beating());
+
         this
             .initEvents()
-            .runBeating();
+            .runBeating(10);
     };
 
     Ship.prototype.render = function() {
@@ -70,15 +72,15 @@ define([
          * draw both static and dynamic bodies
          */
         this.view
-            .applyColor(this.color, this.options.opacity)
+            .applyColor(this.color, this.opacity)
             .drawBody(this.coords, this.options.size / Math.sqrt(2))
             .drawBody(this.coords, this.size / Math.sqrt(2));
 
         /*
          * draw a front arc for each moving direction
          */
-        for (var moveDirection in this.moveIntervalDirections) {
-            if (this.moveIntervalDirections[moveDirection]) {
+        for (var moveDirection in this.movingDirections) {
+            if (this.movingDirections[moveDirection]) {
                 this.view.drawFrontArc(this.coords, this.size / 2, Math.PI * 0.4, moveDirection);
             }
         }
@@ -97,11 +99,10 @@ define([
         return this.trigger('render');
     };
 
-    Ship.prototype.runBeating = function() {
-        var self = this;
-        window.setInterval(function() {
-            self.trigger('beat');
-        }, this.interval);
+    Ship.prototype.destroy = function() {
+        this.on('beat', function() {
+            this.opacity -= 0.01;
+        });
 
         return this;
     };
@@ -112,16 +113,19 @@ define([
         return this.trigger('move', { coords: this.coords });
     };
 
-    Ship.prototype.shift = function(axis, isPositive) {
-        var coords = this.coords;
+    Ship.prototype.shift = function(direction) {
+        var coords = this.coords,
+            axis = +_.contains([ 'up', 'down' ], direction),
+            isPositive = +_.contains([ 'right', 'down' ], direction);
+
         coords[axis] += this.options.movingStep * (isPositive ? 1 : -1);
 
         return this.move(coords);
     };
 
     Ship.prototype.isMoving = function() {
-        for (var direction in this.moveIntervalDirections) {
-            if (this.moveIntervalDirections[direction]) {
+        for (var direction in this.movingDirections) {
+            if (this.movingDirections[direction]) {
                 return true;
             }
         }
@@ -167,7 +171,7 @@ define([
             /*
              * A shield can be activated only while moving along current directions
              */
-            this.shieldDirections[direction] = !!this.moveIntervalDirections[direction];
+            this.shieldDirections[direction] = !!this.movingDirections[direction];
         }
 
         return this;
@@ -194,8 +198,8 @@ define([
     };
 
     Ship.prototype.shot = function() {
-        for (var direction in this.moveIntervalDirections) {
-            if (!this.moveIntervalDirections[direction]) { continue; }
+        for (var direction in this.movingDirections) {
+            if (!this.movingDirections[direction]) { continue; }
 
             if (!this.bulletsInQueue) { continue; }
 
@@ -207,46 +211,29 @@ define([
     };
 
     Ship.prototype.initEvents = function() {
-        this.on('shift', function(data) {
-            var direction = [
-                [ 'left' , 'right' ],
-                [ 'up' , 'down' ]
-            ] [data.axis][+data.isPositive];
+        this.on('beat', function() {
+            _.each(this.movingDirections, function(isMoving, direction) {
+                if (!isMoving || this.isFacingBound(direction)) { return; }
 
-            if (data.toStop) {
-                window.clearInterval(this.moveIntervalDirections[direction]);
-                this.moveIntervalDirections[direction] = null;
-
-                if (!this.isMoving()) {
-                    this.trigger('stop');
-                }
-
-                return;
-            }
-
-            /*
-             * skipping an event if ship is already moving in current direction
-             */
-            if (this.moveIntervalDirections[direction]) { return; }
-
-            var self = this;
-            this.moveIntervalDirections[direction] = window.setInterval(function() {
-                /*
-                 * skipping a move if ship is facing a bound in current direction
-                 */
-                if (!self.isFacingBound(direction)) {
-                    self.shift(data.axis, data.isPositive);
-                }
-            }, this.interval);
+                this.shift(direction);
+            }, this);
         });
 
         this.on('beat', this.resize);
 
-        this.on('shield', function(data) {
+        this.on('control:shift', function(data) {
+            this.movingDirections[data.direction] = !data.toStop;
+
+            if (data.toStop && !this.isMoving()) {
+                this.trigger('stop');
+            }
+        });
+
+        this.on('control:shield', function(data) {
             this.toggleShield(!data.toStop);
         });
 
-        this.on('weapon', function(data) {
+        this.on('control:weapon', function(data) {
             /*
              * start/stop charging a gun
              */
@@ -257,14 +244,12 @@ define([
                  * fire all bullets, one at a time
                  */
                 this.on('beat', this.shot);
-                // console.log('fire starts');
             }
         });
 
         this.on('shot', function() {
             if (this.bulletsInQueue <= 0) {
                 this.off('beat', this.shot);
-                // console.log('fire stops');
             }
         });
 

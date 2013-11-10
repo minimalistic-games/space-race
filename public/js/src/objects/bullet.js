@@ -1,10 +1,9 @@
 define([
-    'events',
-], function(Events) {
+], function() {
     "use strict";
 
     var Bullet = function(ctx, coords, direction, options) {
-        _.extend(this, Events);
+        _.extend(this, Backbone.Events);
 
         this.coords = coords;
         this.direction = direction;
@@ -19,7 +18,10 @@ define([
         this.size = this.options.size;
         this.color = this.options.color;
 
-        // console.log(this.direction);
+        /*
+         * time to live [ms]
+         */
+        this.ttl = 2000;
     };
 
     Bullet.prototype.render = function() {
