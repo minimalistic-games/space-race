@@ -2,8 +2,9 @@ define([
 ], function() {
     "use strict";
 
-    var ShipView = function(ctx) {
+    var ShipView = function(ctx, size) {
         this.ctx = ctx;
+        this.size = size;
 
         this.directionAngles = {
             right: 0,
@@ -44,12 +45,16 @@ define([
         return coord - size / 2;
     };
 
-    ShipView.prototype.drawBody = function(coords, width) {
+    ShipView.prototype.drawBody = function(coords, size) {
+        if (!size) {
+            size = this.size;
+        }
+
         this.ctx.fillRect(
-            this.getRectCoord(coords[0], width),
-            this.getRectCoord(coords[1], width),
-            width,
-            width
+            this.getRectCoord(coords[0], size),
+            this.getRectCoord(coords[1], size),
+            size,
+            size
         );
 
         return this;

@@ -7,11 +7,6 @@ define([
 
     var Ship = function(ctx, bounds, options) {
         /*
-         * a helper object to delegate partial rendering
-         */
-        this.view = new ShipView(ctx);
-
-        /*
          * map's bounds, should restrict a moving area
          */
         this.bounds = bounds;
@@ -23,6 +18,11 @@ define([
             movingStep: 4,
             resizingStep: 2
         }, options);
+
+        /*
+         * a helper object to delegate partial rendering
+         */
+        this.view = new ShipView(ctx, this.options.size);
 
         this.id = null;
 
@@ -60,7 +60,7 @@ define([
          */
         this.bullets = [];
 
-        _.extend(this, Backbone.Events, new Beating());
+        _.extend(this, new Beating());
 
         this
             .initEvents()
@@ -73,7 +73,7 @@ define([
          */
         this.view
             .applyColor(this.color, this.opacity)
-            .drawBody(this.coords, this.options.size / Math.sqrt(2))
+            .drawBody(this.coords)
             .drawBody(this.coords, this.size / Math.sqrt(2));
 
         /*
@@ -204,10 +204,23 @@ define([
             if (!this.bulletsInQueue) { continue; }
 
             this.bulletsInQueue--;
-            this.bullets.push(new Bullet(this.view.ctx, this.coords, direction));
+
+            var bullet = new Bullet(this.view.ctx, _.clone(this.coords), direction, {
+                color: this.color
+            });
+
+            this.bullets.push(bullet);
+
+            bullet.on('stop', this.reduceBullets, this);
         }
 
         return this.trigger('shot');
+    };
+
+    Ship.prototype.reduceBullets = function() {
+        this.bullets.shift();
+
+        return this;
     };
 
     Ship.prototype.initEvents = function() {
@@ -255,6 +268,7 @@ define([
 
         this.on('render', function() {
             _.each(this.bullets, function(bullet) {
+                if (!bullet) { return; }
                 bullet.render();
             });
         });
