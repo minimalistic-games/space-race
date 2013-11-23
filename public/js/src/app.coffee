@@ -1,8 +1,8 @@
 define [
-  'objects/bounds',
-  'objects/ship',
-  'behaviors/controllable',
-  'behaviors/identifiable',
+  'objects/bounds'
+  'objects/ship'
+  'behaviors/controllable'
+  'behaviors/identifiable'
   'backbone'
 ], (Bounds, Ship, Controllable, Identifiable) ->
   class App
@@ -39,7 +39,7 @@ define [
       ship.once 'register', (data) =>
         ship.id = data.id
         ship.coords = data.coords
-        @objects.controlledShip = ship
+        @objects.controlled_ship = ship
 
       # tell server about a shift
       ship.on 'control:shift', (data) =>
@@ -84,6 +84,6 @@ define [
       draw = =>
         window.requestAnimationFrame draw
         clear()
-        _.each @objects, (object) -> object.render()
+        object.render() for object in @objects
 
       window.requestAnimationFrame draw
