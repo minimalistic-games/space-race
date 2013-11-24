@@ -84,6 +84,6 @@ define [
       draw = =>
         window.requestAnimationFrame draw
         clear()
-        object.render() for object in @objects
+        object.render() for name, object of @objects
 
       window.requestAnimationFrame draw

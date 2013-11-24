@@ -57,7 +57,7 @@ define [
       @view.drawFrontArc @coords, @size / 2, Math.PI * 0.4, direction for direction, is_moving of @moving_directions when is_moving
 
       # draw shields (directions are set on turning shields on)
-      @view.drawFrontArc @coords, @size * 0.8, Math.PI * 0.7, direction for direction of @shield_directions when is_moving
+      @view.drawFrontArc @coords, @size * 0.8, Math.PI * 0.7, direction for direction, is_moving of @shield_directions when is_moving
 
       @view.showBulletsInQueue @coords, @bullets_in_queue
 

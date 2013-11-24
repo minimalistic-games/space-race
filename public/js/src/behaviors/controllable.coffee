@@ -23,13 +23,17 @@ define [
         # storing binded event handlers
         # to be able to detach them by reference
         if toAttach
-          @attachedDomEvents[type] = (e) -> handler.call @, e
+          @attachedDomEvents[type] = (e) => handler.call @, e
 
         document[(if toAttach then 'add' else 'remove') + 'EventListener'] type, @attachedDomEvents[type], false
 
-    handleKey: (e)->
+    isValidKey: (key) ->
+      @keys_values ?= _.values @keys
+      key in @keys_values
+
+    handleKey: (e) ->
       key = e.keyIdentifier
-      return unless key in @keys
+      return unless @isValidKey key
 
       if @keys.space is key
         return @trigger 'control:shield',

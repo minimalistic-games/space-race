@@ -17,7 +17,7 @@ require [
 ], (App) ->
   canvas = document.getElementById 'canvas'
 
-  if not canvas.getContext
+  unless canvas.getContext
     document.body.innerText = canvas.innerHTML
     return ->
 

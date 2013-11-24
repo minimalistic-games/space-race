@@ -6,9 +6,9 @@ define [
       @options = _.extend
         color: [ 0, 0, 0 ]
         opacity: 0.6
-        radius: 8
-        step: 2
-        stepTreshold: 32
+        radius: 6
+        step: 4
+        stepTreshold: 8
       , options
 
       @radius = @options.radius
@@ -36,33 +36,36 @@ define [
 
     shift: ->
       axis = +(@direction in [ 'up', 'down' ])
-      isPositive = +(direction in [ 'right', 'down' ])
+      isPositive = +(@direction in [ 'right', 'down' ])
 
       @coords[axis] += @step * (if isPositive then 1 else -1)
 
     speadUp: ->
-      @step *= 1.05
+      @step *= 1.04
       @trigger 'stepTreshold' if @options.stepTreshold < @step
 
     slowDown: ->
-      @step /= 2
+      @step /= 1.01
       @trigger 'stop' if @options.step > @step
 
     blowUp: ->
-      @radius *= 1.04
+      @radius *= 1.1
+
+    blowDown: ->
+      @radius /= 1.08
 
     fadeOut: ->
       @opacity -= 0.01
 
+    toggleMutators: (to_enable, mutators...) ->
+      @[if to_enable then 'on' else 'off'] 'beat', mutator for mutator in mutators
+
     initEvents: ->
-      @on 'beat', @shift
-      @on 'beat', @speadUp
-      @on 'beat', @blowUp
-      @on 'beat', @fadeOut
+      @toggleMutators on, @shift, @fadeOut, @speadUp, @blowDown
 
       @on 'stepTreshold', ->
-        @off 'beat', @speadUp
-        @on 'beat', @slowDown
+        @toggleMutators off, @speadUp, @blowDown
+        @toggleMutators on, @slowDown, @blowUp
 
       @on 'stop', ->
         @off 'beat', @slowDown
