@@ -2,7 +2,7 @@ define [
 ], ->
   class ShipView
     constructor: (@ctx, @size) ->
-      @directionAngles =
+      @direction_angles =
         right: 0
         up: - Math.PI * 0.5
         left: - Math.PI
@@ -45,8 +45,8 @@ define [
         coords[0],
         coords[1],
         radius,
-        angle / 2 + @directionAngles[direction],
-        - angle / 2 + @directionAngles[direction],
+        angle / 2 + @direction_angles[direction],
+        - angle / 2 + @direction_angles[direction],
         yes
       )
       @ctx.fill()

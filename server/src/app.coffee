@@ -7,32 +7,32 @@ Registry = require './objects/registry'
 registry = new Registry Ship
 
 io.sockets.on 'connection', (socket) ->
-    id = null
+  id = null
 
-    socket.on 'identify', (data) ->
-        id = data.id
-        ship = registry.get id
+  socket.on 'identify', (data) ->
+    id = data.id
+    ship = registry.get id
 
-        if not ship
-            ship = registry.create()
-            id = ship.id
+    if not ship
+      ship = registry.create()
+      id = ship.id
 
-        socket.emit 'register', ship.toClientData()
-        socket.broadcast.emit 'create', ship.toClientData()
+    socket.emit 'register', ship.toClientData()
+    socket.broadcast.emit 'create', ship.toClientData()
 
-        _.each _.without(registry.all(), ship), (otherShip) ->
-            socket.emit 'create', otherShip.toClientData()
+    _.each _.without(registry.all(), ship), (other_ship) ->
+      socket.emit 'create', other_ship.toClientData()
 
-    socket.on 'disconnect', ->
-        return unless id
-        registry.remove id
-        socket.broadcast.emit 'remove', { id: id }
+  socket.on 'disconnect', ->
+    return unless id
+    registry.remove id
+    socket.broadcast.emit 'remove', id: id
 
-    socket.on 'shift', (data) ->
-        return unless id
-        socket.broadcast.emit 'shift', _.extend data, { id: id }
+  socket.on 'shift', (data) ->
+    return unless id
+    socket.broadcast.emit 'shift', _.extend data, id: id
 
-    socket.on 'move', (data) ->
-        return unless id
-        ship = registry.get id
-        ship.move data.coords
+  socket.on 'move', (data) ->
+    return unless id
+    ship = registry.get id
+    ship.move data.coords

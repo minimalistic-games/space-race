@@ -8,7 +8,7 @@ define [
         opacity: 0.6
         radius: 6
         step: 4
-        stepTreshold: 8
+        step_treshold: 8
       , options
 
       @radius = @options.radius
@@ -42,7 +42,7 @@ define [
 
     speadUp: ->
       @step *= 1.04
-      @trigger 'stepTreshold' if @options.stepTreshold < @step
+      @trigger 'step_treshold' if @options.step_treshold < @step
 
     slowDown: ->
       @step /= 1.01
@@ -63,7 +63,7 @@ define [
     initEvents: ->
       @toggleMutators on, @shift, @fadeOut, @speadUp, @blowDown
 
-      @on 'stepTreshold', ->
+      @on 'step_treshold', ->
         @toggleMutators off, @speadUp, @blowDown
         @toggleMutators on, @slowDown, @blowUp
 

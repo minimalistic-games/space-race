@@ -4,11 +4,11 @@ define [
     constructor: ->
       _.extend @, Backbone.Events
 
-      @domEvents =
+      @dom_events =
         'keydown': @handleKey
         'keyup': @handleKey
 
-      @attachedDomEvents = {}
+      @attached_dom_events = {}
 
       @keys =
         up: 'Up'
@@ -18,14 +18,13 @@ define [
         space: 'U+0020'
         ctrl: 'Control'
 
-    toggleDomEvents: (toAttach) ->
-      for type, handler of @domEvents
+    toggleDomEvents: (to_attach) ->
+      for type, handler of @dom_events
         # storing binded event handlers
         # to be able to detach them by reference
-        if toAttach
-          @attachedDomEvents[type] = (e) => handler.call @, e
+        @attached_dom_events[type] = (e) => handler.call @, e if to_attach
 
-        document[(if toAttach then 'add' else 'remove') + 'EventListener'] type, @attachedDomEvents[type], false
+        document[(if to_attach then 'add' else 'remove') + 'EventListener'] type, @attached_dom_events[type], false
 
     isValidKey: (key) ->
       @keys_values ?= _.values @keys
@@ -45,4 +44,4 @@ define [
 
       @trigger 'control:shift',
         direction: _.invert(@keys)[key]
-        to_stop: 'keyup' == e.type
+        to_stop: 'keyup' is e.type

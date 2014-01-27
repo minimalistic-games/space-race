@@ -4,7 +4,7 @@ define [
   'objects/bullet',
 ], (Beating, ShipView, Bullet) ->
   class Ship
-    constructor: (ctx, @bounds, options)->
+    constructor: (ctx, @bounds, options) ->
       @options = _.extend
         coords: [ 100, 100 ]
         size: 40
