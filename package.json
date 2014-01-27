@@ -6,6 +6,7 @@
   "dependencies": {
     "underscore": "",
     "express": "3.x",
-    "socket.io": ""
+    "socket.io": "",
+    "jade": ""
   }
 }
