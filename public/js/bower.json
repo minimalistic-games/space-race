@@ -1,13 +1,13 @@
 {
-    "name": "space-race",
-    "version": "0.0.0",
-    "main": "lib/main.js",
-    "ignore": [
-        "**/.*"
-    ],
-    "dependencies": {
-        "requirejs": "",
-        "underscore": "",
-        "backbone": ">= 1.1"
-    }
+  "name": "space-race",
+  "version": "0.0.0",
+  "main": "lib/main.js",
+  "ignore": [
+    "**/.*"
+  ],
+  "dependencies": {
+    "requirejs": "",
+    "underscore": "",
+    "backbone": ">= 1.1"
+  }
 }

@@ -1,16 +1,9 @@
 require.config
   baseUrl: 'js/lib'
   paths:
-    underscore: '../bower_components/underscore/underscore-min'
-    backbone: '../bower_components/backbone/backbone'
-  shim:
-    underscore:
-      exports: '_'
-    backbone:
-      deps: [ 'underscore' ]
-      exports: 'Backbone'
-    socketio:
-      exports: 'io'
+    jquery: 'jquery_mock' # a hack against backbone dependency
+    underscore: '../bower_components/underscore/underscore'
+    backbone: '../bower_components/backbone/backbone' # just to utilize Backbone.Events
 
 require [
   'app'
