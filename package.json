@@ -8,5 +8,13 @@
     "express": "3.x",
     "socket.io": "",
     "jade": ""
+  },
+  "devDependencies": {
+    "gulp-util": "",
+    "gulp": "",
+    "coffee-script": "",
+    "gulp-coffee": "",
+    "gulp-watch": "",
+    "gulp-changed": ""
   }
 }
