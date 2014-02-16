@@ -1,47 +1,64 @@
 define [
 ], ->
+  # @see https://developer.mozilla.org/en/docs/Web/API/Event
   class Controllable
+
+    # mapping for keys identifiers
+    # note that keys are partially used for stating a direction of 'control:shift' event
+    _keys:
+      up: 'Up'
+      down: 'Down'
+      left: 'Left'
+      right: 'Right'
+      space: 'U+0020'
+      ctrl: 'Control'
+
+    # caching storage for @_keys values
+    _keys_values: []
+
+    # storage for binded event handlers
+    # to be able to detach them by reference
+    _attached_dom_events: {}
+
     constructor: ->
       _.extend @, Backbone.Events
 
-      @dom_events =
-        'keydown': @handleKey
-        'keyup': @handleKey
+      @_keys_values = _.values @_keys
 
-      @attached_dom_events = {}
-
-      @keys =
-        up: 'Up'
-        down: 'Down'
-        left: 'Left'
-        right: 'Right'
-        space: 'U+0020'
-        ctrl: 'Control'
+      @_dom_events =
+        'keydown': @_handleKey
+        'keyup': @_handleKey
 
     toggleDomEvents: (to_attach) ->
-      for type, handler of @dom_events
-        # storing binded event handlers
-        # to be able to detach them by reference
-        @attached_dom_events[type] = (e) => handler.call @, e if to_attach
+      for type, handler of @_dom_events
+        if to_attach then @_attachDomEvent type, handler else @_detachDomEvent type
 
-        document[(if to_attach then 'add' else 'remove') + 'EventListener'] type, @attached_dom_events[type], false
+    _attachDomEvent: (type, handler) ->
+      @_attached_dom_events[type] = handler.bind @
+      document.addEventListener type, @_attached_dom_events[type]
 
-    isValidKey: (key) ->
-      @keys_values ?= _.values @keys
-      key in @keys_values
+    _detachDomEvent: (type) ->
+      document.removeEventListener type, @_attached_dom_events[type]
+      delete @_attached_dom_events[type]
 
-    handleKey: (e) ->
+    # triggers an inner event based on keys mapping
+    _handleKey: (e) ->
       key = e.keyIdentifier
-      return unless @isValidKey key
+      return unless @_isValidKey key
 
-      if @keys.space is key
+      is_keyup = 'keyup' is e.type
+
+      if @_keys.space is key
         return @trigger 'control:shield',
-          to_stop: 'keyup' is e.type
+          to_stop: is_keyup
 
-      if @keys.ctrl is key
+      if @_keys.ctrl is key
         return @trigger 'control:weapon',
-          to_fire: 'keyup' is e.type
+          to_fire: is_keyup
 
       @trigger 'control:shift',
-        direction: _.invert(@keys)[key]
-        to_stop: 'keyup' is e.type
+        direction: _.invert(@_keys)[key]
+        to_stop: is_keyup
+
+    _isValidKey: (key) ->
+      key in @_keys_values
