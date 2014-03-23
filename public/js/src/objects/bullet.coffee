@@ -2,14 +2,15 @@ define [
   'behaviors/beating'
 ], (Beating) ->
   class Bullet
+    defaults:
+      color: [ 0, 0, 0 ]
+      opacity: 0.6
+      radius: 6
+      step: 4
+      step_treshold: 8
+
     constructor: (@ctx, @coords, @direction, options) ->
-      @options = _.extend
-        color: [ 0, 0, 0 ]
-        opacity: 0.6
-        radius: 6
-        step: 4
-        step_treshold: 8
-      , options
+      @options = _.extend @defaults, options
 
       @radius = @options.radius
       @step = @options.step
@@ -18,10 +19,10 @@ define [
       _.extend @, new Beating
 
       @initEvents()
-      @runBeating 10
+      @runBeating()
 
     render: ->
-      @ctx.fillStyle = 'rgba(' + @options.color.join(',') + ',' + @opacity + ')'
+      @ctx.fillStyle = "rgba(#{@options.color.join(',')}, #{@opacity})"
 
       @ctx.beginPath()
       @ctx.arc(

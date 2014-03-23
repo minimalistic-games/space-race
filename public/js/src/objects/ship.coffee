@@ -1,17 +1,18 @@
 define [
-  'behaviors/beating',
-  'views/ship',
-  'objects/bullet',
+  'behaviors/beating'
+  'views/ship'
+  'objects/bullet'
 ], (Beating, ShipView, Bullet) ->
   class Ship
+    defaults:
+      coords: [ 100, 100 ]
+      size: 40
+      color: [ 0, 0, 0 ]
+      moving_step: 4
+      resizing_step: 2
+
     constructor: (ctx, @bounds, options) ->
-      @options = _.extend
-        coords: [ 100, 100 ]
-        size: 40
-        color: [ 0, 0, 0 ]
-        moving_step: 4
-        resizing_step: 2
-      , options
+      @options = _.extend @defaults, options
 
       # a helper object to delegate partial rendering
       @view = new ShipView ctx, @options.size
@@ -29,7 +30,7 @@ define [
 
       @opacity = 0.4
 
-      @moving_directions = { up: no, down: no, left: no, right: no }
+      @moving_directions = up: no, down: no, left: no, right: no
 
       @shield_directions = _.clone @moving_directions
 
@@ -45,7 +46,7 @@ define [
       _.extend @, new Beating
 
       @initEvents()
-      @runBeating 10
+      @runBeating()
 
     render: ->
       # draw both static and dynamic bodies
@@ -54,14 +55,20 @@ define [
       @view.drawBody @coords, @size / Math.sqrt 2
 
       # draw a front arc for each moving direction
-      @view.drawFrontArc @coords, @size / 2, Math.PI * 0.4, direction for direction, is_moving of @moving_directions when is_moving
+      @renderArcs 0.5, 0.4, @moving_directions
 
       # draw shields (directions are set on turning shields on)
-      @view.drawFrontArc @coords, @size * 0.8, Math.PI * 0.7, direction for direction, is_moving of @shield_directions when is_moving
+      @renderArcs 0.8, 0.7, @shield_directions
 
       @view.showBulletsInQueue @coords, @bullets_in_queue
 
       @trigger 'render'
+
+    renderArcs: (size_coef, angle_coef, by_directions) ->
+      radius = @size * size_coef
+      angle = Math.PI * angle_coef
+
+      @view.drawFrontArc @coords, radius, angle, direction for direction, is_moving of by_directions when is_moving
 
     destroy: ->
       @on 'beat', ->
@@ -99,9 +106,9 @@ define [
         when 'up' then return @coords[1] <= radius + @bounds.thickness
         when 'down' then return @coords[1] >= @bounds.height - radius - @bounds.thickness
 
-    toggleShield: (toProceed) ->
+    toggleShield: (to_proceed) ->
       for direction of @shield_directions
-        if not toProceed
+        if not to_proceed
           @shield_directions[direction] = no
           continue
 

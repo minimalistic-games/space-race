@@ -6,10 +6,10 @@ define [
   'backbone'
 ], (Bounds, Ship, Controllable, Identifiable) ->
   class App
-    constructor: (@ctx)->
-      # objects to render
-      @objects = {}
+    # objects to render
+    objects: {}
 
+    constructor: (@ctx)->
       # application state transport
       @socket = io.connect 'http://' + window.location.host
 
@@ -25,6 +25,10 @@ define [
         color: [ 100, 150, 200 ]
         thickness: 10
 
+      # @todo:
+      #   derive a ControlledShip class from Ship
+      #   configure it with socket
+      #   and move all the listeners there
       ship = new Ship @ctx, @objects.bounds,
         color: [ 50, 50, 50 ]
       _.extend ship, new Controllable, new Identifiable @socket
@@ -61,20 +65,29 @@ define [
           coords: data.coords
         ship.id = data.id
 
-        @objects['ship:' + ship.id] = ship
+        @registerShip ship
 
       # remove disconnected ship
       @socket.on 'remove', (data) =>
-        ship = @objects['ship:' + data.id]
+        ship = @getRegisteredShip data.id
         ship.destroy()
 
-        window.setTimeout ->
-          delete @objects['ship:' + data.id]
-        , 1000
+        window.setTimeout (@unregisterShipById.bind @, data.id), 1000
 
       # shift another ship
       @socket.on 'shift', (data) =>
-        @objects['ship:' + data.id].trigger 'control:shift', data
+        ship = @getRegisteredShip data.id
+        ship.trigger 'control:shift', data
+
+    # @todo: introduce a registry class
+    getRegisteredShip: (id) ->
+      @objects['ship:' + id]
+
+    registerShip: (ship) ->
+      @objects['ship:' + ship.id] = ship
+
+    unregisterShipById: (id) ->
+      delete @objects['ship:' + id]
 
     # Redraws all registered objects after cleaning the canvas
     startDrawingLoop: ->

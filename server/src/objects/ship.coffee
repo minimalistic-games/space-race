@@ -1,11 +1,11 @@
 class Ship
-    constructor: (@id) ->
-        @coords = [ 200, 200 ]
+  constructor: (@id) ->
+    @coords = [ 200, 200 ]
 
-    move: (@coords) -> @
+  move: (@coords) -> @
 
-    toClientData: ->
-        id: @id
-        coords: @coords
+  toClientData: ->
+    id: @id
+    coords: @coords
 
 module.exports = Ship

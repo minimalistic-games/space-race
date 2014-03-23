@@ -21,7 +21,7 @@ define [
       @color = color
       @opacity = opacity
 
-      @ctx.fillStyle = 'rgba(' + color.join(',') + ',' + opacity + ')'
+      @ctx.fillStyle = "rgba(#{color.join(',')}, #{opacity})"
 
     text: (coords, text) ->
       @ctx.fillText text, coords[0] + 10, coords[1] + 10
