@@ -4,7 +4,6 @@ define [
 ], (ShipView, Bullet) ->
   class Ship
     world: null
-    bounds: null
 
     defaults:
       coords: [ 100, 100 ]
@@ -13,7 +12,7 @@ define [
       moving_step: 4
       resizing_step: 2
 
-    constructor: (@world, @bounds, options) ->
+    constructor: (@world, options) ->
       _.extend @, Backbone.Events
 
       @options = _.extend @defaults, options
@@ -82,16 +81,14 @@ define [
 
     move: (coords) ->
       @coords = coords
-
-      @trigger 'move',
-        coords: @coords
+      @trigger 'move', coords: @coords
 
     shift: (direction) ->
       coords = @coords
       axis = +(direction in [ 'up', 'down' ])
-      isPositive = +(direction in [ 'right', 'down' ])
+      is_positive = +(direction in [ 'right', 'down' ])
 
-      coords[axis] += @options.moving_step * (if isPositive then 1 else -1)
+      coords[axis] += @options.moving_step * (if is_positive then 1 else -1)
 
       @move coords
 
@@ -105,12 +102,7 @@ define [
         @color[i] = Math.min 100, @color[i] + random_sign * 10
 
     isFacingBound: (direction) ->
-      radius = @options.size / 2
-      switch direction
-        when 'left' then return @coords[0] <= radius + @bounds.thickness
-        when 'right' then return @coords[0] >= @bounds.width - radius - @bounds.thickness
-        when 'up' then return @coords[1] <= radius + @bounds.thickness
-        when 'down' then return @coords[1] >= @bounds.height - radius - @bounds.thickness
+      @world.isObjectFacingBound @coords, @options.size, direction
 
     toggleShield: (to_proceed) ->
       for direction of @shield_directions

@@ -7,6 +7,7 @@ define [
   'backbone'
 ], (World, Bounds, Ship, Controllable, Identifiable) ->
   class App
+    # main container object
     world: null
 
     # objects to render
@@ -19,27 +20,26 @@ define [
       @world = new World
       @world.ctx = ctx
 
+      bounds = new Bounds @world, color: [ 100, 150, 200 ]
+      @world.bounds = bounds
+      @objects.bounds = bounds
+
       @socket = io.connect 'http://' + window.location.host
 
     # Starts application
     init: ->
-      @addInitialObjects()
+      @addControlledShip()
       @listenServer()
       @startDrawingLoop()
       @world.run()
 
     # Creates one controlled ship and canvas bounds
-    addInitialObjects: ->
-      @objects.bounds = new Bounds @world,
-        color: [ 100, 150, 200 ]
-        thickness: 10
-
+    addControlledShip: ->
       # @todo:
       #   derive a ControlledShip class from Ship
       #   configure it with socket
       #   and move all the listeners there
-      ship = new Ship @world, @objects.bounds,
-        color: [ 50, 50, 50 ]
+      ship = new Ship @world, color: [ 50, 50, 50 ]
       _.extend ship, new Controllable, new Identifiable @socket
 
       ship.toggleDomEvents yes
@@ -69,7 +69,7 @@ define [
     listenServer: ->
       # create another ship
       @socket.on 'create', (data) =>
-        ship = new Ship @world, @objects.bounds,
+        ship = new Ship @world,
           color: [ 100, 100, 100 ]
           coords: data.coords
         ship.id = data.id

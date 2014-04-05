@@ -7,7 +7,7 @@ define [
     defaults:
       color: [ 0, 0, 0 ]
       opacity: 0.4
-      thickness: 2
+      thickness: 10
 
     constructor: (@world, options) ->
       @options = _.extend @defaults, options
