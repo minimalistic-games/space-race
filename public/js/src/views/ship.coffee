@@ -36,8 +36,7 @@ define [
         @getRectCoord(coords[0], size),
         @getRectCoord(coords[1], size),
         size,
-        size
-      )
+        size)
 
     drawFrontArc: (coords, radius, angle, direction) ->
       @ctx.beginPath()
@@ -47,8 +46,7 @@ define [
         radius,
         angle / 2 + @direction_angles[direction],
         - angle / 2 + @direction_angles[direction],
-        yes
-      )
+        yes)
       @ctx.fill()
 
     showBulletsInQueue: (coords, number) ->

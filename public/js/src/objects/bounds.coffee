@@ -1,13 +1,18 @@
 define [
 ], ->
   class Bounds
+    world: null
+    ctx: null
+
     defaults:
       color: [ 0, 0, 0 ]
       opacity: 0.4
       thickness: 2
 
-    constructor: (@ctx, options) ->
+    constructor: (@world, options) ->
       @options = _.extend @defaults, options
+
+      @ctx = @world.ctx
 
       @width = @ctx.canvas.width
       @height = @ctx.canvas.height
@@ -23,5 +28,4 @@ define [
         @thickness / 2,
         @thickness / 2,
         @width - @thickness,
-        @height - @thickness
-      )
+        @height - @thickness)

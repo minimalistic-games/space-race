@@ -1,9 +1,11 @@
 define [
-  'behaviors/beating'
   'views/ship'
   'objects/bullet'
-], (Beating, ShipView, Bullet) ->
+], (ShipView, Bullet) ->
   class Ship
+    world: null
+    bounds: null
+
     defaults:
       coords: [ 100, 100 ]
       size: 40
@@ -11,11 +13,13 @@ define [
       moving_step: 4
       resizing_step: 2
 
-    constructor: (ctx, @bounds, options) ->
+    constructor: (@world, @bounds, options) ->
+      _.extend @, Backbone.Events
+
       @options = _.extend @defaults, options
 
       # a helper object to delegate partial rendering
-      @view = new ShipView ctx, @options.size
+      @view = new ShipView @world.ctx, @options.size
 
       @id = null
 
@@ -43,10 +47,7 @@ define [
       # registry of bullets that a fired currently
       @bullets = []
 
-      _.extend @, new Beating
-
       @initEvents()
-      @runBeating()
 
     render: ->
       # draw both static and dynamic bodies
@@ -70,9 +71,14 @@ define [
 
       @view.drawFrontArc @coords, radius, angle, direction for direction, is_moving of by_directions when is_moving
 
-    destroy: ->
-      @on 'beat', ->
-        @opacity -= 0.01
+    destroy: (callback) ->
+      @listenTo @world, 'tick', ->
+        if @opacity > 0
+          @opacity -= 0.01
+          return
+
+        @stopListening()
+        callback()
 
     move: (coords) ->
       @coords = coords
@@ -128,8 +134,7 @@ define [
       @bullets_in_queue++ if @bullets_in_queue < @bullets_limit
 
     createBullet: (direction) ->
-      bullet = new Bullet @view.ctx, _.clone(@coords), direction,
-        color: @color
+      bullet = new Bullet @world, _.clone(@coords), direction, color: @color
 
       @bullets.push bullet
 
@@ -144,10 +149,10 @@ define [
       @trigger 'shot'
 
     initEvents: ->
-      @on 'beat', ->
+      @listenTo @world, 'tick', ->
         @shift direction for direction, is_moving of @moving_directions when is_moving and not @isFacingBound direction
 
-      @on 'beat', @resize
+      @listenTo @world, 'tick', @resize
 
       @on 'control:shift', (data) ->
         @moving_directions[data.direction] = not data.to_stop
@@ -158,13 +163,13 @@ define [
 
       @on 'control:weapon', (data) ->
         # start/stop charging a gun
-        @[if data.to_fire then 'off' else 'on'] 'beat', @queueBullet
+        @[if data.to_fire then 'stopListening' else 'listenTo'] @world, 'tick', @queueBullet
 
         # fire all bullets, one at a time
-        @on 'beat', @shot if data.to_fire
+        @listenTo @world, 'tick', @shot if data.to_fire
 
       @on 'shot', ->
-        @off 'beat', @shot unless 0 < @bullets_in_queue
+        @stopListening @world, 'tick', @shot unless 0 < @bullets_in_queue
 
       @on 'render', ->
         bullet.render() for bullet in @bullets when bullet

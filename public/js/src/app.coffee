@@ -1,16 +1,24 @@
 define [
+  'objects/world'
   'objects/bounds'
   'objects/ship'
   'behaviors/controllable'
   'behaviors/identifiable'
   'backbone'
-], (Bounds, Ship, Controllable, Identifiable) ->
+], (World, Bounds, Ship, Controllable, Identifiable) ->
   class App
+    world: null
+
     # objects to render
     objects: {}
 
-    constructor: (@ctx)->
-      # application state transport
+    # application state transport
+    socket: null
+
+    constructor: (ctx) ->
+      @world = new World
+      @world.ctx = ctx
+
       @socket = io.connect 'http://' + window.location.host
 
     # Starts application
@@ -18,10 +26,11 @@ define [
       @addInitialObjects()
       @listenServer()
       @startDrawingLoop()
+      @world.run()
 
     # Creates one controlled ship and canvas bounds
     addInitialObjects: ->
-      @objects.bounds = new Bounds @ctx,
+      @objects.bounds = new Bounds @world,
         color: [ 100, 150, 200 ]
         thickness: 10
 
@@ -29,7 +38,7 @@ define [
       #   derive a ControlledShip class from Ship
       #   configure it with socket
       #   and move all the listeners there
-      ship = new Ship @ctx, @objects.bounds,
+      ship = new Ship @world, @objects.bounds,
         color: [ 50, 50, 50 ]
       _.extend ship, new Controllable, new Identifiable @socket
 
@@ -60,7 +69,7 @@ define [
     listenServer: ->
       # create another ship
       @socket.on 'create', (data) =>
-        ship = new Ship @ctx, @objects.bounds,
+        ship = new Ship @world, @objects.bounds,
           color: [ 100, 100, 100 ]
           coords: data.coords
         ship.id = data.id
@@ -70,9 +79,7 @@ define [
       # remove disconnected ship
       @socket.on 'remove', (data) =>
         ship = @getRegisteredShip data.id
-        ship.destroy()
-
-        window.setTimeout (@unregisterShipById.bind @, data.id), 1000
+        ship.destroy => @unregisterShipById data.id
 
       # shift another ship
       @socket.on 'shift', (data) =>
@@ -92,7 +99,7 @@ define [
     # Redraws all registered objects after cleaning the canvas
     startDrawingLoop: ->
       clear = =>
-        @ctx.clearRect 0, 0, canvas.width, canvas.height
+        @world.ctx.clearRect 0, 0, canvas.width, canvas.height
 
       draw = =>
         window.requestAnimationFrame draw

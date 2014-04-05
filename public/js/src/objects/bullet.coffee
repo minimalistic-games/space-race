@@ -1,7 +1,8 @@
 define [
-  'behaviors/beating'
-], (Beating) ->
+], ->
   class Bullet
+    world: null
+
     defaults:
       color: [ 0, 0, 0 ]
       opacity: 0.6
@@ -9,31 +10,31 @@ define [
       step: 4
       step_treshold: 8
 
-    constructor: (@ctx, @coords, @direction, options) ->
+    constructor: (@world, @coords, @direction, options) ->
+      _.extend @, Backbone.Events
+
       @options = _.extend @defaults, options
 
       @radius = @options.radius
       @step = @options.step
       @opacity = @options.opacity
 
-      _.extend @, new Beating
-
       @initEvents()
-      @runBeating()
 
     render: ->
-      @ctx.fillStyle = "rgba(#{@options.color.join(',')}, #{@opacity})"
+      ctx = @world.ctx
 
-      @ctx.beginPath()
-      @ctx.arc(
+      ctx.fillStyle = "rgba(#{@options.color.join(',')}, #{@opacity})"
+
+      ctx.beginPath()
+      ctx.arc(
         @coords[0],
         @coords[1],
         @radius,
         0,
         Math.PI * 2,
-        true
-      )
-      @ctx.fill()
+        true)
+      ctx.fill()
 
     shift: ->
       axis = +(@direction in [ 'up', 'down' ])
@@ -49,24 +50,24 @@ define [
       @step /= 1.01
       @trigger 'stop' if @options.step > @step
 
-    blowUp: ->
+    inflate: ->
       @radius *= 1.1
 
-    blowDown: ->
+    deflate: ->
       @radius /= 1.08
 
     fadeOut: ->
       @opacity -= 0.01
 
     toggleMutators: (to_enable, mutators...) ->
-      @[if to_enable then 'on' else 'off'] 'beat', mutator for mutator in mutators
+      @[if to_enable then 'listenTo' else 'stopListening'] @world, 'tick', mutator for mutator in mutators
 
     initEvents: ->
-      @toggleMutators on, @shift, @fadeOut, @speadUp, @blowDown
+      @toggleMutators on, @shift, @fadeOut, @speadUp, @deflate
 
       @on 'step_treshold', ->
-        @toggleMutators off, @speadUp, @blowDown
-        @toggleMutators on, @slowDown, @blowUp
+        @toggleMutators off, @speadUp, @deflate
+        @toggleMutators on, @slowDown, @inflate
 
       @on 'stop', ->
-        @off 'beat', @slowDown
+        @stopListening @world, 'tick'
