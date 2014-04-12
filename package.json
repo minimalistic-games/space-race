@@ -10,13 +10,14 @@
     "jade": ""
   },
   "devDependencies": {
-    "gulp-util": "",
-    "gulp": "",
+    "chai": "",
     "coffee-script": "",
-    "gulp-coffee": "",
-    "gulp-watch": "",
+    "gulp": "",
     "gulp-changed": "",
-    "mocha": "",
-    "chai": ""
+    "gulp-coffee": "",
+    "gulp-mocha": "",
+    "gulp-util": "",
+    "gulp-watch": "",
+    "mocha": ""
   }
 }

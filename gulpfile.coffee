@@ -2,6 +2,7 @@ gulp = require 'gulp'
 changed = require 'gulp-changed'
 watch = require 'gulp-watch'
 coffee = require 'gulp-coffee'
+mocha = require 'gulp-mocha'
 
 sources =
   './server/src/**/*.coffee': './server/lib/'
@@ -27,6 +28,10 @@ gulp.task 'build', ->
 
 gulp.task 'watch', ->
   apply_to_sources complile_with_watch
+
+gulp.task 'test', ->
+  gulp.src './server/lib/test/**/*.js'
+    .pipe mocha reporter: 'spec'
 
 gulp.task 'default', [
   'build'
