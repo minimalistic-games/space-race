@@ -17,12 +17,18 @@ describe 'Registry', ->
     expect(item).to.be.instanceof Dummy
     expect(item).to.be.equal collection[0]
 
-  it 'Stores items with ids starting from 1', ->
+  it 'Stores items with ids starting from 0', ->
     registry = new Registry Dummy
     registry.create()
-    expect(registry.get(1)).to.exist
+    expect(registry.get(0)).to.exist
 
   it 'Increments an id for each new item being stored', ->
     registry = new Registry Dummy
-    registry.create() for i in [1..10]
-    expect(registry.all()).to.have.keys _.map [1..10], (n) -> n.toString()
+    registry.create() for i in [0..9]
+    expect(registry.all()).to.have.keys _.map [0..9], (n) -> n.toString()
+
+  it 'Removes an item from the collection', ->
+    registry = new Registry Dummy
+    registry.create()
+    registry.remove 0
+    expect(registry.get(0)).to.be.undefined
