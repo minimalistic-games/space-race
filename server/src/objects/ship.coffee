@@ -4,8 +4,4 @@ class Ship
 
   move: (@coords) -> @
 
-  toClientData: ->
-    id: @id
-    coords: @coords
-
 module.exports = Ship

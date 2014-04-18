@@ -2,9 +2,13 @@ _ = require 'underscore'
 server = require './server'
 io = require('socket.io').listen server
 Ship = require './objects/ship'
+ClientShipDecorator = require './objects/client_ship_decorator'
 Registry = require './objects/registry'
 
 registry = new Registry Ship
+
+to_client_data = (ship) ->
+  (new ClientShipDecorator ship, 'id', 'coords').toJSON()
 
 io.sockets.on 'connection', (socket) ->
   id = null
@@ -13,15 +17,18 @@ io.sockets.on 'connection', (socket) ->
     id = data.id
     ship = registry.get id
 
-    if not ship
+    unless ship
       ship = registry.create()
       id = ship.id
 
-    socket.emit 'register', ship.toClientData()
-    socket.broadcast.emit 'create', ship.toClientData()
+    client_ship_data = to_client_data ship
 
-    _.each _.without(registry.all(), ship), (other_ship) ->
-      socket.emit 'create', other_ship.toClientData()
+    socket.emit 'register', client_ship_data
+    socket.broadcast.emit 'create', client_ship_data
+
+    # @todo: introduce "createBunch" to send all the data in one message
+    _.each _.omit(registry.all(), id.toString()), (other_ship) ->
+      socket.emit 'create', to_client_data other_ship
 
   socket.on 'disconnect', ->
     return unless id

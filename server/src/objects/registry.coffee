@@ -1,21 +1,24 @@
 class Registry
   constructor: (@object_type) ->
-    @collection = []
+    # using an object instead of array to avoid
+    # storing "array holes" for removed items
+    @_collection = {}
+    @_next_id = 0
 
   create: ->
-    id = @collection.length
-    object = new @object_type id
-    @collection[id] = object
+    object = new @object_type @_next_id
+    @_collection[@_next_id] = object
+    @_next_id += 1
     object
 
   get: (id) ->
-    @collection[id]
+    @_collection[id]
 
   all: ->
-    @collection
+    @_collection
 
   remove: (id) ->
-    delete @collection[id]
+    delete @_collection[id]
     @
 
 module.exports = Registry
