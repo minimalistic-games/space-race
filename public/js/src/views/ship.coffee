@@ -14,17 +14,12 @@ define [
       @preset()
 
     preset: ->
-      @ctx.textAlign = 'end'
-      @ctx.font = "12px sans-serif"
+      @ctx.textAlign = 'start'
+      @ctx.textBaseline = 'top'
+      @ctx.font = '10px sans-serif'
 
-    applyColor: (color, opacity) ->
-      @color = color
-      @opacity = opacity
-
+    applyColor: (@color, @opacity) ->
       @ctx.fillStyle = "rgba(#{color.join(',')}, #{opacity})"
-
-    text: (coords, text) ->
-      @ctx.fillText text, coords[0] + 10, coords[1] + 10
 
     getRectCoord: (coord, size) ->
       coord - size / 2
@@ -49,10 +44,18 @@ define [
         yes)
       @ctx.fill()
 
-    showBulletsInQueue: (coords, number) ->
+    text: (text, coords, offset = 0, align = 'start', baseline = 'top') ->
       color = @color
       opacity = @opacity
+      text_align = @ctx.textAlign
+      text_baseline = @ctx.textBaseline
 
       @applyColor [ 255, 255, 255 ], 0.4
-      @text coords, number or ''
+      @ctx.textAlign = align
+      @ctx.textBaseline = baseline
+
+      @ctx.fillText text, coords[0] + offset, coords[1] + offset
+
       @applyColor color, opacity
+      @ctx.textAlign = text_align
+      @ctx.textBaseline = text_baseline

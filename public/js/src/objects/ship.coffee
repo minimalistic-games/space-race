@@ -6,12 +6,11 @@ define [
     world: null
 
     defaults:
-      acceleration_limit: 10
-      acceleration_step: 1
       coords: [ 100, 100 ]
       size: 40
       color: [ 0, 0, 0 ]
-      resizing_step: 2
+      acceleration_limit: 10
+      acceleration_step: 0.4
       bullets_limit: 100
 
     constructor: (@world, options) ->
@@ -92,7 +91,8 @@ define [
       # draw shields (directions are set on turning shields on)
       @_renderArcs 0.8, 0.7, @shield_directions
 
-      @view.showBulletsInQueue @coords, @bullets_in_queue
+      @view.text @id, @coords, -12
+      @view.text @bullets_in_queue or '', @coords, 12, 'end', 'bottom'
 
       @trigger 'render'
 
@@ -117,9 +117,9 @@ define [
 
       acceleration = @acceleration_directions[direction] + @options.acceleration_step * (if is_moving then 1 else -1)
 
-      return if acceleration < 0 or acceleration > @options.acceleration_limit
+      return if acceleration < 0
 
-      @acceleration_directions[direction] = acceleration
+      @acceleration_directions[direction] = acceleration if acceleration < @options.acceleration_limit
 
       coords = @coords
       axis = +(direction in [ 'up', 'down' ])
@@ -152,11 +152,12 @@ define [
         @shield_directions[direction] = @moving_directions[direction]
 
     _resizeOnTick: ->
-      if not @_isMoving()
-        if @size > @options.size
-          @size -= @options.resizing_step * 2
-      else if @size < @options.size * 4
-        @size += @options.resizing_step
+      delta = 0.2 * _.max @acceleration_directions
+      if @_isMoving()
+        @size += delta
+      else
+        size = @size - Math.max delta, 4
+        @size = size if size > @options.size
 
     _queueBullet: ->
       @bullets_in_queue += 1 if @bullets_in_queue < @options.bullets_limit
