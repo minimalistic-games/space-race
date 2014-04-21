@@ -79,7 +79,8 @@ define [
       # remove disconnected ship
       @socket.on 'remove', (data) =>
         ship = @getRegisteredShip data.id
-        ship.destroy => @unregisterShipById data.id
+        ship.destroy()
+        @unregisterShipById data.id
 
       # shift another ship
       @socket.on 'shift', (data) =>

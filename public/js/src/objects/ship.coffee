@@ -70,14 +70,8 @@ define [
       @on 'render', ->
         bullet.render() for bullet in @bullets when bullet
 
-    destroy: (callback) ->
-      @listenTo @world, 'tick', ->
-        if @opacity > 0
-          @opacity -= 0.01
-          return
-
-        @stopListening()
-        callback()
+    destroy: ->
+      @stopListening()
 
     render: ->
       # draw both static and dynamic bodies

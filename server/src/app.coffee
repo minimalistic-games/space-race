@@ -32,7 +32,7 @@ io.sockets.on 'connection', (socket) ->
 
   socket.on 'disconnect', ->
     return unless id
-    registry.remove id
+    # keeping an object in registry - letting clients to re-connect
     socket.broadcast.emit 'remove', id: id
 
   socket.on 'shift', (data) ->
