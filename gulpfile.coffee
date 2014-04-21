@@ -1,4 +1,5 @@
 gulp = require 'gulp'
+gutil = require 'gulp-util'
 changed = require 'gulp-changed'
 watch = require 'gulp-watch'
 coffee = require 'gulp-coffee'
@@ -14,7 +15,7 @@ apply_to_sources = (fn) ->
 compile_coffee = (src, dest, to_watch) ->
   gulp.src src
     .pipe if to_watch then watch() else changed dest
-    .pipe coffee()
+    .pipe(coffee()).on 'error', gutil.log
     .pipe gulp.dest dest
 
 compile_changed = (src, dest) ->
