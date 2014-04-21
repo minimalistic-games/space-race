@@ -21,6 +21,16 @@ define [
 
       @initEvents()
 
+    initEvents: ->
+      @toggleMutators on, @shift, @fadeOut, @speadUp, @deflate
+
+      @on 'step_treshold', ->
+        @toggleMutators off, @speadUp, @deflate
+        @toggleMutators on, @slowDown, @inflate
+
+      @on 'stop', ->
+        @stopListening @world, 'tick'
+
     render: ->
       ctx = @world.ctx
 
@@ -61,13 +71,3 @@ define [
 
     toggleMutators: (to_enable, mutators...) ->
       @[if to_enable then 'listenTo' else 'stopListening'] @world, 'tick', mutator for mutator in mutators
-
-    initEvents: ->
-      @toggleMutators on, @shift, @fadeOut, @speadUp, @deflate
-
-      @on 'step_treshold', ->
-        @toggleMutators off, @speadUp, @deflate
-        @toggleMutators on, @slowDown, @inflate
-
-      @on 'stop', ->
-        @stopListening @world, 'tick'
