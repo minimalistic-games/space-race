@@ -1,5 +1,5 @@
 require.config
-  baseUrl: 'js/lib'
+  baseUrl: 'js/build'
   paths:
     jquery: 'jquery_mock' # a hack against backbone dependency
     underscore: '../bower_components/underscore/underscore'

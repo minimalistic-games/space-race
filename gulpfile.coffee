@@ -6,8 +6,8 @@ coffee = require 'gulp-coffee'
 mocha = require 'gulp-mocha'
 
 sources =
-  './server/src/**/*.coffee': './server/lib/'
-  './public/js/src/**/*.coffee': './public/js/lib/'
+  './server/src/**/*.coffee': './server/build/'
+  './public/js/src/**/*.coffee': './public/js/build/'
 
 apply_to_sources = (fn) ->
   fn src, dest for src, dest of sources
@@ -31,7 +31,7 @@ gulp.task 'watch', ->
   apply_to_sources complile_with_watch
 
 gulp.task 'test', ->
-  gulp.src './server/lib/test/**/*.js'
+  gulp.src './server/build/test/**/*.js'
     .pipe mocha reporter: 'spec'
 
 gulp.task 'default', [

@@ -8,7 +8,7 @@ canvas 'n' node multiplayer game
 2. install npm deps: `npm install`
 3. install bower deps: `cd public/js/ && bower install && cd ../../`
 4. compile [with watch]: `gulp [watch]`
-5. run the back-end: `node server/lib/app`
+5. run the back-end: `node server/build/app`
 6. open app in browser (only chrome for now): `localhost:3000` (see server config to change port)
 
 ## keys
