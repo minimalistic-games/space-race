@@ -2,10 +2,9 @@ define [
   'objects/world'
   'objects/bounds'
   'objects/ship'
-  'behaviors/controllable'
-  'behaviors/identifiable'
+  'objects/controlled_ship'
   'backbone'
-], (World, Bounds, Ship, Controllable, Identifiable) ->
+], (World, Bounds, Ship, ControlledShip, Identified) ->
   class App
     # main container object
     world: null
@@ -24,48 +23,18 @@ define [
       @world.bounds = bounds
       @objects.bounds = bounds
 
-      @socket = io.connect 'http://' + window.location.host
+      @socket = io.connect "http://#{window.location.host}"
 
-    # Starts application
     init: ->
       @addControlledShip()
       @listenServer()
       @startDrawingLoop()
       @world.run()
 
-    # Creates one controlled ship and canvas bounds
     addControlledShip: ->
-      # @todo:
-      #   derive a ControlledShip class from Ship
-      #   configure it with socket
-      #   and move all the listeners there
-      ship = new Ship @world, color: [ 50, 50, 50 ]
-      _.extend ship, new Controllable, new Identifiable @socket
+      ship = new ControlledShip @world, color: [ 50, 50, 50 ], @socket
+      ship.init => @objects.controlled_ship = ship
 
-      ship.toggleDomEvents yes
-      ship.identify 'controlledShip:id'
-      @initControlledShipListeners ship
-
-    # Subscribes controlled ship to custom events
-    initControlledShipListeners: (ship) ->
-      # append to the list of renderable objects
-      ship.once 'register', (data) =>
-        ship.id = data.id
-        ship.coords = data.coords
-        @objects.controlled_ship = ship
-
-      # tell server about a shift
-      ship.on 'control:shift', (data) =>
-        @socket.emit 'shift', data
-
-      # change color a bit
-      ship.on 'stop', ship.changeColor
-
-      # tell server about a move
-      ship.on 'move', (data) =>
-        @socket.emit 'move', data
-
-    # Subscribes to server events
     listenServer: ->
       # create another ship
       @socket.on 'create', (data) =>

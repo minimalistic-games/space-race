@@ -61,10 +61,10 @@ define [
       @trigger 'stop' if @options.step > @step
 
     inflate: ->
-      @radius *= 1.1
+      @radius *= 1.04
 
     deflate: ->
-      @radius /= 1.08
+      @radius /= 1.02
 
     fadeOut: ->
       @opacity -= 0.01
