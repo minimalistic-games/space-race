@@ -5,7 +5,9 @@
   "private": true,
   "dependencies": {
     "underscore": "",
-    "express": "3.x",
+    "express": "",
+    "morgan": "",
+    "compression": "",
     "socket.io": "",
     "jade": ""
   },
