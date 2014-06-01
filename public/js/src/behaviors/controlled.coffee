@@ -10,8 +10,8 @@ define [
       down: 'Down'
       left: 'Left'
       right: 'Right'
-      space: 'U+0020'
-      ctrl: 'Control'
+      ctrl: 'U+00A2'
+      # space: 'U+0020'
 
     # caching storage for @keys values
     _keys_values: []

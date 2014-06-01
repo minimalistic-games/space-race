@@ -33,10 +33,6 @@ define [
 
     _passDomEvents: ->
       @on 'key', (key, is_down) ->
-        if @keys.space is key
-          return @trigger 'control:shield',
-            to_stop: not is_down
-
         if @keys.ctrl is key
           return @trigger 'control:weapon',
             to_fire: not is_down

@@ -36,7 +36,13 @@ define [
 
       @moving_directions = up: no, down: no, left: no, right: no
       @acceleration_directions = up: 0, down: 0, left: 0, right: 0
-      @shield_directions = _.clone @moving_directions
+
+      @blocks = [
+        [ 0, 1 ]
+        [ 1, -1 ]
+        [ -1, 0 ]
+        [ 1, 1 ]
+      ]
 
       # number of bullets in queue
       @bullets_in_queue = 0
@@ -48,14 +54,10 @@ define [
 
     initEvents: ->
       @listenTo @world, 'tick', @_shiftOnTick
-      @listenTo @world, 'tick', @_resizeOnTick
 
       @on 'control:shift', (data) ->
         @moving_directions[data.direction] = not data.to_stop
         @trigger 'stop' if data.to_stop and not @_isMoving()
-
-      @on 'control:shield', (data) ->
-        @_toggleShield not data.to_stop
 
       @on 'control:weapon', (data) ->
         # start/stop charging a gun
@@ -77,13 +79,8 @@ define [
       # draw both static and dynamic bodies
       @view.applyColor @color, @opacity
       @view.drawBody @coords
-      @view.drawBody @coords, @size / Math.sqrt 2
 
-      # draw a front arc for each moving direction
-      @_renderArcs 0.5, 0.4, @moving_directions
-
-      # draw shields (directions are set on turning shields on)
-      @_renderArcs 0.8, 0.7, @shield_directions
+      _.each @blocks, @_renderBlock.bind @
 
       @view.text @id, @coords, -12
       @view.text @bullets_in_queue or '', @coords, 12, 'end', 'bottom'
@@ -95,11 +92,9 @@ define [
         random_sign = Math.round(Math.random() * 2) - 1
         @color[i] = Math.min 100, @color[i] + random_sign * 10
 
-    _renderArcs: (size_coef, angle_coef, directions) ->
-      radius = @size * size_coef
-      angle = Math.PI * angle_coef
-
-      @view.drawFrontArc @coords, radius, angle, direction for direction, is_moving of directions when is_moving
+    _renderBlock: (normalized_coords) ->
+      @view.drawBody _.map normalized_coords, (normalized_coord, index) =>
+        @coords[index] + normalized_coord * (@size - 5)
 
     _shiftOnTick: ->
       @_shift direction, is_moving for direction, is_moving of @moving_directions
@@ -133,25 +128,6 @@ define [
 
     _isFacingBound: (direction) ->
       @world.isObjectFacingBound @coords, @options.size, direction
-
-    _toggleShield: (to_proceed) ->
-      for direction of @shield_directions
-        if not to_proceed
-          @shield_directions[direction] = no
-          continue
-
-        continue if @shield_directions[direction]
-
-        # a shield can be activated only while moving along current directions
-        @shield_directions[direction] = @moving_directions[direction]
-
-    _resizeOnTick: ->
-      delta = 0.2 * _.max @acceleration_directions
-      if @_isMoving()
-        @size += delta
-      else
-        size = @size - Math.max delta, 4
-        @size = size if size > @options.size
 
     _queueBullet: ->
       @bullets_in_queue += 1 if @bullets_in_queue < @options.bullets_limit

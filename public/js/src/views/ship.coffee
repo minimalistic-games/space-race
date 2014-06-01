@@ -33,17 +33,6 @@ define [
         size,
         size)
 
-    drawFrontArc: (coords, radius, angle, direction) ->
-      @ctx.beginPath()
-      @ctx.arc(
-        coords[0],
-        coords[1],
-        radius,
-        angle / 2 + @direction_angles[direction],
-        - angle / 2 + @direction_angles[direction],
-        yes)
-      @ctx.fill()
-
     text: (text, coords, offset = 0, align = 'start', baseline = 'top') ->
       color = @color
       opacity = @opacity
