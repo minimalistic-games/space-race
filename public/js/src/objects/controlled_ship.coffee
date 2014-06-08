@@ -15,6 +15,7 @@ define [
       @once 'register', (data) =>
         @id = data.id
         @coords = data.coords
+        @blocks = data.blocks
         @listenDom()
         @_passDomEvents()
 

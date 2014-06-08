@@ -41,6 +41,7 @@ define [
         ship = new Ship @world,
           color: [ 100, 100, 100 ]
           coords: data.coords
+          blocks: data.blocks
         ship.id = data.id
 
         @registerShip ship

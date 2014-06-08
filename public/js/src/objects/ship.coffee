@@ -37,15 +37,7 @@ define [
       @moving_directions = up: no, down: no, left: no, right: no
       @acceleration_directions = up: 0, down: 0, left: 0, right: 0
 
-      # e.g. [
-      #   [ 0, 1 ]
-      #   [ 1, -1 ]
-      #   [ -1, 0 ]
-      #   [ 1, 1 ]
-      # ]
-      @blocks = _.times 4, ->
-                  _.times 2, ->
-                    Math.floor(Math.floor(Math.random() * 10) / 5) * 2 - 1
+      @blocks = @options.blocks
 
       # number of bullets in queue
       @bullets_in_queue = 0
@@ -102,7 +94,8 @@ define [
       @view.drawBody coords, @size - 10
 
     _getBlockOffset: (axis) ->
-      10 * (@acceleration_directions[[ 'right', 'down' ][axis]] - @acceleration_directions[[ 'left', 'up' ][axis]])
+      10 * (@acceleration_directions[[ 'right', 'down' ][axis]] -
+            @acceleration_directions[[ 'left', 'up' ][axis]])
 
     _shiftOnTick: ->
       @_shift direction, is_moving for direction, is_moving of @moving_directions

@@ -8,7 +8,7 @@ Registry = require './objects/registry'
 registry = new Registry Ship
 
 to_client_data = (ship) ->
-  (new ClientShipDecorator ship, 'id', 'coords').toJSON()
+  (new ClientShipDecorator ship, 'id', 'coords', 'blocks').toJSON()
 
 io.sockets.on 'connection', (socket) ->
   id = null
