@@ -3,6 +3,7 @@ class Ship
 
   constructor: (@id) ->
     @coords = [ 200, 200 ]
+    @is_active = yes
     @blocks = @_initBlocks()
 
   move: (@coords) -> @

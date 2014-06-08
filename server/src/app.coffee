@@ -17,7 +17,9 @@ io.sockets.on 'connection', (socket) ->
     id = data.id
     ship = registry.get id
 
-    unless ship
+    if ship
+      ship.is_active = yes
+    else
       ship = registry.create()
       id = ship.id
 
@@ -28,11 +30,13 @@ io.sockets.on 'connection', (socket) ->
 
     # @todo: introduce "createBunch" to send all the data in one message
     _.each _.omit(registry.all(), id.toString()), (other_ship) ->
-      socket.emit 'create', to_client_data other_ship
+      socket.emit 'create', to_client_data other_ship if other_ship.is_active
 
+  # keeping an object in registry - letting clients to re-connect
   socket.on 'disconnect', ->
     return unless id
-    # keeping an object in registry - letting clients to re-connect
+    ship = registry.get id
+    ship.is_active = no
     socket.broadcast.emit 'remove', id: id
 
   socket.on 'shift', (data) ->
