@@ -9,7 +9,7 @@ define [
       coords: [ 100, 100 ]
       size: 40
       color: [ 0, 0, 0 ]
-      acceleration_limit: 10
+      acceleration_limit: 20
       acceleration_step: 0.4
       bullets_limit: 100
 
@@ -37,12 +37,15 @@ define [
       @moving_directions = up: no, down: no, left: no, right: no
       @acceleration_directions = up: 0, down: 0, left: 0, right: 0
 
-      @blocks = [
-        [ 0, 1 ]
-        [ 1, -1 ]
-        [ -1, 0 ]
-        [ 1, 1 ]
-      ]
+      # e.g. [
+      #   [ 0, 1 ]
+      #   [ 1, -1 ]
+      #   [ -1, 0 ]
+      #   [ 1, 1 ]
+      # ]
+      @blocks = _.times 4, ->
+                  _.times 2, ->
+                    Math.floor(Math.floor(Math.random() * 10) / 5) * 2 - 1
 
       # number of bullets in queue
       @bullets_in_queue = 0
@@ -76,7 +79,6 @@ define [
       @stopListening()
 
     render: ->
-      # draw both static and dynamic bodies
       @view.applyColor @color, @opacity
       @view.drawBody @coords
 
@@ -93,8 +95,14 @@ define [
         @color[i] = Math.min 100, @color[i] + random_sign * 10
 
     _renderBlock: (normalized_coords) ->
-      @view.drawBody _.map normalized_coords, (normalized_coord, index) =>
-        @coords[index] + normalized_coord * (@size - 5)
+      coords = _.map normalized_coords, (normalized_coord, axis) =>
+        normalized_coord * @size + @coords[axis] + @_getBlockOffset axis
+
+      @view.applyColor @color, @opacity * 0.6
+      @view.drawBody coords, @size - 10
+
+    _getBlockOffset: (axis) ->
+      10 * (@acceleration_directions[[ 'right', 'down' ][axis]] - @acceleration_directions[[ 'left', 'up' ][axis]])
 
     _shiftOnTick: ->
       @_shift direction, is_moving for direction, is_moving of @moving_directions
@@ -110,17 +118,10 @@ define [
 
       @acceleration_directions[direction] = acceleration if acceleration < @options.acceleration_limit
 
-      coords = @coords
       axis = +(direction in [ 'up', 'down' ])
       is_positive = +(direction in [ 'right', 'down' ])
 
-      coords[axis] += @acceleration_directions[direction] * (if is_positive then 1 else -1)
-
-      @_move coords
-
-    _move: (coords) ->
-      @coords = coords
-      @trigger 'move', coords: @coords
+      @coords[axis] += @acceleration_directions[direction] * (if is_positive then 1 else -1)
 
     _isMoving: ->
       return yes for direction, is_moving of @moving_directions when is_moving

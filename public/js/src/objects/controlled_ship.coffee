@@ -27,9 +27,10 @@ define [
       # change color a bit
       @on 'stop', @changeColor
 
-      # tell server about a move
-      @on 'move', (data) =>
-        @socket.emit 'move', data
+      # update server with current coords
+      window.setInterval =>
+        @socket.emit 'move', coords: @coords
+      , 800
 
     _passDomEvents: ->
       @on 'key', (key, is_down) ->
