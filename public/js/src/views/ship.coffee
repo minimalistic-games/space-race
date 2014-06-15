@@ -8,7 +8,7 @@ define [
         left: - Math.PI
         down: - Math.PI * 1.5
 
-      @color = [ 0, 0, 0 ]
+      @color = [0, 0, 0]
       @opacity = 1
 
       @preset()
@@ -39,7 +39,7 @@ define [
       text_align = @ctx.textAlign
       text_baseline = @ctx.textBaseline
 
-      @applyColor [ 255, 255, 255 ], 0.4
+      @applyColor [255, 255, 255], 0.4
       @ctx.textAlign = align
       @ctx.textBaseline = baseline
 

@@ -5,7 +5,7 @@ define [
     ctx: null
 
     defaults:
-      color: [ 0, 0, 0 ]
+      color: [0, 0, 0]
       opacity: 0.4
       thickness: 10
 

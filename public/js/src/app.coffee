@@ -19,7 +19,7 @@ define [
       @world = new World
       @world.ctx = ctx
 
-      bounds = new Bounds @world, color: [ 100, 150, 200 ]
+      bounds = new Bounds @world, color: [100, 150, 200]
       @world.bounds = bounds
       @objects.bounds = bounds
 
@@ -32,14 +32,14 @@ define [
       @world.run()
 
     addControlledShip: ->
-      ship = new ControlledShip @world, color: [ 50, 50, 50 ], @socket
+      ship = new ControlledShip @world, color: [50, 50, 50], @socket
       ship.init => @objects.controlled_ship = ship
 
     listenServer: ->
       # create another ship
       @socket.on 'create', (data) =>
         ship = new Ship @world,
-          color: [ 100, 100, 100 ]
+          color: [100, 100, 100]
           coords: data.coords
           blocks: data.blocks
         ship.id = data.id

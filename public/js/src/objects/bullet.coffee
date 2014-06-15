@@ -4,11 +4,11 @@ define [
     world: null
 
     defaults:
-      color: [ 0, 0, 0 ]
+      color: [0, 0, 0]
       opacity: 0.6
       radius: 6
-      step: 4
-      step_treshold: 8
+      speed: 4
+      speed_limit: 8
 
     constructor: (@world, @coords, @direction, options) ->
       _.extend @, Backbone.Events
@@ -16,7 +16,7 @@ define [
       @options = _.extend @defaults, options
 
       @radius = @options.radius
-      @step = @options.step
+      @speed = @options.speed
       @opacity = @options.opacity
 
       @initEvents()
@@ -24,7 +24,7 @@ define [
     initEvents: ->
       @toggleMutators on, @shift, @fadeOut, @speadUp, @deflate
 
-      @on 'step_treshold', ->
+      @on 'speed_limit', ->
         @toggleMutators off, @speadUp, @deflate
         @toggleMutators on, @slowDown, @inflate
 
@@ -47,18 +47,18 @@ define [
       ctx.fill()
 
     shift: ->
-      axis = +(@direction in [ 'up', 'down' ])
-      isPositive = +(@direction in [ 'right', 'down' ])
+      axis = +(@direction in ['up', 'down'])
+      isPositive = +(@direction in ['right', 'down'])
 
-      @coords[axis] += @step * (if isPositive then 1 else -1)
+      @coords[axis] += @speed * (if isPositive then 1 else -1)
 
     speadUp: ->
-      @step *= 1.04
-      @trigger 'step_treshold' if @options.step_treshold < @step
+      @speed *= 1.04
+      @trigger 'speed_limit' if @options.speed_limit < @speed
 
     slowDown: ->
-      @step /= 1.01
-      @trigger 'stop' if @options.step > @step
+      @speed /= 1.01
+      @trigger 'stop' if @options.speed > @speed
 
     inflate: ->
       @radius *= 1.04
