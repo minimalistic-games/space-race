@@ -1,12 +1,13 @@
 define [
-], ->
+  'views/base'
+], (BaseView) ->
   class Bullet
     world: null
 
     defaults:
       color: [0, 0, 0]
       opacity: 0.6
-      radius: 6
+      size: 6
       speed: 4
       speed_limit: 8
 
@@ -15,7 +16,9 @@ define [
 
       @options = _.extend @defaults, options
 
-      @radius = @options.radius
+      @view = new BaseView @world.ctx, @options.size
+
+      @size = @options.size
       @speed = @options.speed
       @opacity = @options.opacity
 
@@ -32,19 +35,8 @@ define [
         @stopListening @world, 'tick'
 
     render: ->
-      ctx = @world.ctx
-
-      ctx.fillStyle = "rgba(#{@options.color.join(',')}, #{@opacity})"
-
-      ctx.beginPath()
-      ctx.arc(
-        @coords[0],
-        @coords[1],
-        @radius,
-        0,
-        Math.PI * 2,
-        true)
-      ctx.fill()
+      @view.applyColor @options.color, @opacity
+      @view.drawBody @coords, @size
 
     shift: ->
       axis = +(@direction in ['up', 'down'])
@@ -61,10 +53,10 @@ define [
       @trigger 'stop' if @options.speed > @speed
 
     inflate: ->
-      @radius *= 1.04
+      @size *= 1.04
 
     deflate: ->
-      @radius /= 1.02
+      @size /= 1.02
 
     fadeOut: ->
       @opacity -= 0.01

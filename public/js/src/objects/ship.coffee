@@ -49,6 +49,7 @@ define [
 
     initEvents: ->
       @listenTo @world, 'tick', @_shiftOnTick
+      @listenTo @world, 'tick', @_moveBlocksOnTick
 
       @on 'control:shift', (data) ->
         @to_speed_up[data.direction] = not data.to_stop
@@ -90,12 +91,22 @@ define [
       coords = _.map normalized_coords, (normalized_coord, axis) =>
         normalized_coord * @size + @coords[axis] + @_getBlockOffset axis
 
-      @view.applyColor @color, @opacity * 0.6
+      @view.applyColor @color, @opacity * 0.4
       @view.drawBody coords, @size - 10
 
     _getBlockOffset: (axis) ->
       10 * (@speed[['right', 'down'][axis]] -
             @speed[['left', 'up'][axis]])
+
+    _moveBlocksOnTick: ->
+      to_speed_up = _.some @to_speed_up
+
+      _.each @blocks, (normalized_coords, block_index) =>
+        _.each normalized_coords, (normalized_coord, coord_index) =>
+          return if Math.abs(normalized_coord) <= 0.1 and not to_speed_up
+          @blocks[block_index][coord_index] += 0.01 *
+                                                (if normalized_coord < 0 then -1 else 1) *
+                                                (if to_speed_up then 1 else -2)
 
     _shiftOnTick: ->
       @_shift direction, to_speed_up for direction, to_speed_up of @to_speed_up

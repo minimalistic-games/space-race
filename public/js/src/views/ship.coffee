@@ -1,37 +1,15 @@
 define [
-], ->
-  class ShipView
+  'views/base'
+], (BaseView) ->
+  class ShipView extends BaseView
     constructor: (@ctx, @size) ->
-      @direction_angles =
-        right: 0
-        up: - Math.PI * 0.5
-        left: - Math.PI
-        down: - Math.PI * 1.5
-
-      @color = [0, 0, 0]
-      @opacity = 1
-
+      super
       @preset()
 
     preset: ->
       @ctx.textAlign = 'start'
       @ctx.textBaseline = 'top'
       @ctx.font = '10px sans-serif'
-
-    applyColor: (@color, @opacity) ->
-      @ctx.fillStyle = "rgba(#{color.join(',')}, #{opacity})"
-
-    getRectCoord: (coord, size) ->
-      coord - size / 2
-
-    drawBody: (coords, size) ->
-      size = @size unless size
-
-      @ctx.fillRect(
-        @getRectCoord(coords[0], size),
-        @getRectCoord(coords[1], size),
-        size,
-        size)
 
     text: (text, coords, offset = 0, align = 'start', baseline = 'top') ->
       color = @color
