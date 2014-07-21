@@ -16,7 +16,7 @@ define [
     constructor: (@world, options) ->
       _.extend @, Backbone.Events
 
-      @options = _.extend @defaults, options
+      @options = _.extend {}, @defaults, options
 
       # a helper object to delegate partial rendering
       @view = new ShipView @world.ctx, @options.size
@@ -73,12 +73,11 @@ define [
 
     render: ->
       @view.applyColor @color, @opacity
-      @view.drawBody @coords
-
-      _.each @blocks, @_renderBlock.bind @
-
+      @view.drawSquare @coords, @size
       @view.text @id, @coords, -12
       @view.text @bullets_in_queue or '', @coords, 12, 'end', 'bottom'
+
+      _.each @blocks, @_renderBlock.bind @
 
       @trigger 'render'
 
@@ -92,7 +91,7 @@ define [
         normalized_coord * @size + @coords[axis] + @_getBlockOffset axis
 
       @view.applyColor @color, @opacity * 0.4
-      @view.drawBody coords, @size - 10
+      @view.drawSquare coords, @size - 10
 
     _getBlockOffset: (axis) ->
       10 * (@speed[['right', 'down'][axis]] -
@@ -105,8 +104,8 @@ define [
         _.each normalized_coords, (normalized_coord, coord_index) =>
           return if Math.abs(normalized_coord) <= 0.1 and not to_speed_up
           @blocks[block_index][coord_index] += 0.01 *
-                                                (if normalized_coord < 0 then -1 else 1) *
-                                                (if to_speed_up then 1 else -2)
+                                               (if normalized_coord < 0 then -1 else 1) *
+                                               (if to_speed_up then 1 else -2)
 
     _shiftOnTick: ->
       @_shift direction, to_speed_up for direction, to_speed_up of @to_speed_up

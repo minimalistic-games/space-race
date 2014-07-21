@@ -23,6 +23,9 @@ define [
       @world.bounds = bounds
       @objects.bounds = bounds
 
+      _.each (@world.generateStars 10), (star, index) =>
+        @objects["star:#{index}"] = star
+
       @socket = io.connect "http://#{window.location.host}"
 
     init: ->

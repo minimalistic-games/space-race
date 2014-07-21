@@ -2,7 +2,7 @@ define [
   'views/base'
 ], (BaseView) ->
   class ShipView extends BaseView
-    constructor: (@ctx, @size) ->
+    constructor: (@ctx) ->
       super
       @preset()
 

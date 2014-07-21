@@ -14,7 +14,7 @@ define [
     constructor: (@world, @coords, @direction, options) ->
       _.extend @, Backbone.Events
 
-      @options = _.extend @defaults, options
+      @options = _.extend {}, @defaults, options
 
       @view = new BaseView @world.ctx, @options.size
 
@@ -36,13 +36,13 @@ define [
 
     render: ->
       @view.applyColor @options.color, @opacity
-      @view.drawBody @coords, @size
+      @view.drawSquare @coords, @size
 
     shift: ->
       axis = +(@direction in ['up', 'down'])
-      isPositive = +(@direction in ['right', 'down'])
+      is_positive = +(@direction in ['right', 'down'])
 
-      @coords[axis] += @speed * (if isPositive then 1 else -1)
+      @coords[axis] += @speed * (if is_positive then 1 else -1)
 
     speadUp: ->
       @speed *= 1.04

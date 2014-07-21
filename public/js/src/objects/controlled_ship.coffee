@@ -5,7 +5,7 @@ define [
 ], (Ship, Controlled, Identified) ->
   class ControlledShip extends Ship
     constructor: (world, options, @socket) ->
-      super world, options
+      super
       _.extend @, new Controlled, new Identified @socket
 
     init: (on_register_callback) ->
