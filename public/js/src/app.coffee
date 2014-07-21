@@ -62,18 +62,21 @@ define [
 
     # @todo: introduce a registry class
     getRegisteredShip: (id) ->
-      @objects['ship:' + id]
+      @objects["ship:#{id}"]
 
     registerShip: (ship) ->
-      @objects['ship:' + ship.id] = ship
+      @objects["ship:#{ship.id}"] = ship
 
     unregisterShipById: (id) ->
-      delete @objects['ship:' + id]
+      delete @objects["ship:#{id}"]
 
     # Redraws all registered objects after cleaning the canvas
     startDrawingLoop: ->
       clear = =>
-        @world.ctx.clearRect 0, 0, canvas.width, canvas.height
+        @world.ctx.clearRect(0,
+                             0,
+                             @world.ctx.canvas.width,
+                             @world.ctx.canvas.height)
 
       draw = =>
         window.requestAnimationFrame draw
