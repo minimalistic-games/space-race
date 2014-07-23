@@ -18,9 +18,5 @@ define [
       @thickness = @options.thickness
 
     render: ->
-      @ctx.strokeStyle = @view.rgba @options.color, @options.opacity
-      @ctx.lineWidth = @thickness
-      @ctx.strokeRect(@thickness / 2,
-                      @thickness / 2,
-                      @width - @thickness,
-                      @height - @thickness)
+      @view.applyStrokeColor @options.color, @options.opacity
+      @view.drawStrokeRect [0, 0], @width, @height, @thickness
