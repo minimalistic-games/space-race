@@ -86,6 +86,15 @@ define [
         random_sign = Math.round(Math.random() * 2) - 1
         @color[i] = Math.min 100, @color[i] + random_sign * 10
 
+    # e.g. (without "@_getBlockOffset()")
+    #
+    # [                [
+    #   [1, -1]          [0 0 1]
+    #   [-1, 0]   =>     [1 * 0]
+    #   [0, 1]           [0 1 1]
+    #   [1, 1]         ]
+    # ]
+    #
     _renderBlock: (normalized_coords) ->
       coords = _.map normalized_coords, (normalized_coord, axis) =>
         normalized_coord * @size + @coords[axis] + @_getBlockOffset axis

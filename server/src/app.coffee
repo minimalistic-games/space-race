@@ -21,6 +21,7 @@ io.sockets.on 'connection', (socket) ->
       ship.is_active = yes
     else
       ship = registry.create()
+      ship.generateBlocks 1
       id = ship.id
 
     client_ship_data = to_client_data ship
