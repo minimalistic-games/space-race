@@ -1,4 +1,4 @@
-class Registry
+module.exports = class Registry
   constructor: (@object_type) ->
     # using an object instead of array to avoid
     # storing "array holes" for removed items
@@ -20,5 +20,3 @@ class Registry
   remove: (id) ->
     delete @_collection[id]
     @
-
-module.exports = Registry

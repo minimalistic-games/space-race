@@ -1,4 +1,4 @@
-class Ship
+module.exports = class Ship
   constructor: (@id) ->
     @coords = [200, 200]
     @blocks = []
@@ -9,8 +9,6 @@ class Ship
   generateBlocks: (level) ->
     @blocks = []
 
-    for row in [-level..level]
-      for col in [-level..level]
-        @blocks.push [row, col] unless row is col is 0 or Math.ceil(Math.random() - 0.5)
-
-module.exports = Ship
+    for y in [-level..level]
+      for x in [-level..level]
+        @blocks.push [x, y] unless x is y is 0 or Math.ceil(Math.random() - 0.5)
