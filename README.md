@@ -18,6 +18,10 @@ canvas 'n' node multiplayer game
 
 details in code: [controllable.coffee](/public/js/src/behaviors/controllable.coffee)
 
+## screenshots
+
+![screenshot](https://dl-web.dropbox.com/get/public/space-race/Screenshot%20from%202014-07-21%2021%3A55%3A34.png?_subject_uid=32309193&w=AAAhCkSo8X-0pTLnOhZYlgPJSQOPNyPn6HHPKyO4-KyTWA)
+
 ## todo
 
 * add "stars/black holes" (growing, exploding, transforming) so "ship's" movements are affected by "gravity"
