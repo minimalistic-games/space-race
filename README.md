@@ -20,7 +20,7 @@ details in code: [controllable.coffee](/public/js/src/behaviors/controllable.cof
 
 ## screenshots
 
-![screenshot](https://dl-web.dropbox.com/get/public/space-race/Screenshot%20from%202014-07-21%2021%3A55%3A34.png?_subject_uid=32309193&w=AAAhCkSo8X-0pTLnOhZYlgPJSQOPNyPn6HHPKyO4-KyTWA)
+![screenshot](https://raw.githubusercontent.com/markhovskiy/markhovskiy.github.io/master/uploads/space_race_screenshot.png)
 
 ## todo
 
