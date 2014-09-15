@@ -1,29 +1,25 @@
 define [
 ], ->
   # @see https://developer.mozilla.org/en/docs/Web/API/Event
+  # @see http://unixpapa.com/js/key.html
   class Controlled
-
-    # mapping for keys identifiers
-    # note that keys are partially used for stating a direction of 'control:shift' event
     keys:
-      up: 'Up'
-      down: 'Down'
-      left: 'Left'
-      right: 'Right'
-      ctrl: 'U+00A2'
-      # space: 'U+0020'
+      left: 37
+      up: 38
+      right: 39
+      down: 40
+      ctrl: 17
 
-    # caching storage for @keys values
-    _keys_values: []
+    _keys_codes: []
 
-    # storage for binded event handlers
-    # to be able to detach them by reference
+    # storage for bound event handlers
+    # (to be able to detach them by reference)
     _attached_dom_events: {}
 
     constructor: ->
       _.extend @, Backbone.Events
 
-      @_keys_values = _.values @keys
+      @_keys_codes = _.values @keys
 
       @_dom_events =
         'keydown': @_handleKey
@@ -48,5 +44,5 @@ define [
       delete @_attached_dom_events[type]
 
     _handleKey: (e) ->
-      if e.keyIdentifier in @_keys_values
-        @trigger 'key', e.keyIdentifier, 'keydown' is e.type
+      if e.keyCode in @_keys_codes
+        @trigger 'key', e.keyCode, 'keydown' is e.type
