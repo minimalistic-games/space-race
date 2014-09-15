@@ -39,6 +39,11 @@ define [
       ship.init => @objects.controlled_ship = ship
 
     listenServer: ->
+      # omits the "The connection to ... was interrupted while the page was loading." error in Firefox
+      window.onbeforeunload = =>
+        @socket.close()
+        return null
+
       # create another ship
       @socket.on 'create', (data) =>
         ship = new Ship @world,
