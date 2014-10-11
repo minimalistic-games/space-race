@@ -4,22 +4,22 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "underscore": "",
-    "express": "",
-    "morgan": "",
-    "compression": "",
-    "socket.io": "",
-    "jade": ""
+    "underscore": "~1.7",
+    "express": "~4.9",
+    "morgan": "~1.3",
+    "compression": "~1.1",
+    "socket.io": "~1.1",
+    "jade": "~1"
   },
   "devDependencies": {
-    "chai": "",
-    "coffee-script": "",
-    "gulp": "",
-    "gulp-changed": "",
-    "gulp-coffee": "",
-    "gulp-mocha": "",
-    "gulp-util": "",
-    "gulp-watch": "",
-    "mocha": ""
+    "chai": "~1",
+    "coffee-script": "~1.8",
+    "gulp": "~3.8",
+    "gulp-changed": "~1.0",
+    "gulp-coffee": "~2.2",
+    "gulp-mocha": "~1.1",
+    "gulp-util": "~3.0",
+    "gulp-watch": "~1.1",
+    "mocha": "~1"
   }
 }
