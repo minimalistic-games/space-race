@@ -1,5 +1,7 @@
 # space-race
 
+[![Dependency Status](https://david-dm.org/markhovskiy/space-race.png)](https://david-dm.org/markhovskiy/space-race)
+
 canvas 'n' node multiplayer game
 
 ## to run locally
