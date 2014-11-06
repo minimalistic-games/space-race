@@ -7,6 +7,8 @@ require.config
 
 require [
   'app'
+  'underscore'
+  'backbone'
 ], (App) ->
   canvas = document.getElementById 'canvas'
 

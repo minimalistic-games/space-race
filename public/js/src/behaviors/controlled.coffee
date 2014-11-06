@@ -1,8 +1,9 @@
 define [
 ], ->
-  # @see https://developer.mozilla.org/en/docs/Web/API/Event
-  # @see http://unixpapa.com/js/key.html
-  class Controlled
+  # a mixin object that subscribes to keyboard events
+  # assumes that "Backbone.Events" are also mixed in
+  controlled =
+    # @see http://unixpapa.com/js/key.html
     keys:
       left: 37
       up: 38
@@ -15,15 +16,6 @@ define [
     # storage for bound event handlers
     # (to be able to detach them by reference)
     _attached_dom_events: {}
-
-    constructor: ->
-      _.extend @, Backbone.Events
-
-      @_keys_codes = _.values @keys
-
-      @_dom_events =
-        'keydown': @_handleKey
-        'keyup': @_handleKey
 
     listenDom: ->
       @_toggleDomEvents yes
@@ -46,3 +38,11 @@ define [
     _handleKey: (e) ->
       if e.keyCode in @_keys_codes
         @trigger 'key', e.keyCode, 'keydown' is e.type
+
+  controlled._keys_codes = _.values controlled.keys
+
+  controlled._dom_events =
+    'keydown': controlled._handleKey
+    'keyup': controlled._handleKey
+
+  controlled

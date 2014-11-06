@@ -4,6 +4,7 @@
 
 canvas 'n' node multiplayer game
 
+
 ## to run locally
 
 1. clone repo: `git clone git@github.com:markhovskiy/space-race.git && cd space-race`
@@ -11,11 +12,13 @@ canvas 'n' node multiplayer game
 3. install bower deps: `cd public/js/ && bower install && cd ../../`
 4. compile [with watch]: `gulp [watch]`
 5. run the back-end: `node server/build/app`
-6. open app in browser: `localhost:3000` (port specified in the [server config] (https://github.com/markhovskiy/space-race/blob/master/server/src/config/server.coffee))
+6. open app in browser: `localhost:3000` (port specified in the [server config](/server/src/config/server.coffee))
+
 
 ## to run tests
 
 `gulp test`
+
 
 ## to play
 
@@ -26,9 +29,11 @@ canvas 'n' node multiplayer game
 
 details in code: [controllable.coffee](/public/js/src/behaviors/controllable.coffee)
 
+
 ## screenshots
 
 ![screenshot](https://raw.githubusercontent.com/markhovskiy/markhovskiy.github.io/master/uploads/space_race_screenshot.png)
+
 
 ## todo
 

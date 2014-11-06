@@ -1,24 +1,19 @@
 define [
   'objects/ship'
   'behaviors/controlled'
-  'behaviors/identified'
-], (Ship, Controlled, Identified) ->
+], (Ship, controlled) ->
   class ControlledShip extends Ship
     constructor: (world, options, @socket) ->
       super
-      _.extend @, new Controlled, new Identified @socket
+      _.extend @, controlled
 
     init: (on_register_callback) ->
-      @identify 'controlled_ship:id'
+      @identify 'controlled_ship:id', (data) =>
+        # sets "id", "coords" and "blocks"
+        _.extend @, data
 
-      # append to the list of renderable objects
-      @once 'register', (data) =>
-        @id = data.id
-        @coords = data.coords
-        @blocks = data.blocks
         @listenDom()
         @_passDomEvents()
-
         on_register_callback()
 
       # tell server about a shift
@@ -32,6 +27,19 @@ define [
       window.setInterval =>
         @socket.emit 'move', coords: @coords
       , 800
+
+    identify: (id_storage_key, callback) ->
+      is_int = (value) -> +value is parseInt value, 10
+
+      id = window.localStorage.getItem id_storage_key
+      throw new TypeError 'stored id must be null or integer' if id and not is_int id
+
+      @socket.emit 'identify', id: id
+
+      @socket.on 'register', (data) =>
+        throw new TypeError 'retrieved id must be integer' unless is_int data.id
+        window.localStorage.setItem id_storage_key, data.id
+        callback data
 
     _passDomEvents: ->
       @on 'key', (key, is_down) ->

@@ -6,8 +6,8 @@
     "**/.*"
   ],
   "dependencies": {
-    "requirejs": "",
-    "underscore": "",
-    "backbone": ">= 1.1"
+    "backbone": "~1.1",
+    "requirejs": "~2.1",
+    "underscore": "~1.7"
   }
 }

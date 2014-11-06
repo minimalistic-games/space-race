@@ -3,8 +3,7 @@ define [
   'objects/bounds'
   'objects/ship'
   'objects/controlled_ship'
-  'backbone'
-], (World, Bounds, Ship, ControlledShip, Identified) ->
+], (World, Bounds, Ship, ControlledShip) ->
   class App
     # main container object
     world: null
