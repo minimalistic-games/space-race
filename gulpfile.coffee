@@ -14,7 +14,7 @@ apply_to_sources = (fn) ->
 
 compile_coffee = (src, dest, to_watch) ->
   (if to_watch then watch(src) else gulp.src(src).pipe(changed dest))
-    .pipe(coffee()).on 'error', gutil.log
+    .pipe(coffee()).on 'error', (err) -> gutil.log err.toString()
     .pipe gulp.dest dest
 
 compile_changed = (src, dest) ->
