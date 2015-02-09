@@ -31,18 +31,18 @@ io.sockets.on 'connection', (socket) ->
 
     # @todo: introduce "createBunch" to send all the data in one message
     _.each _.omit(registry.all(), id.toString()), (other_ship) ->
-      socket.emit 'create', to_client_data other_ship if other_ship.is_active
+      socket.emit('create', to_client_data other_ship) if other_ship.is_active
 
   # keeping an object in registry - letting clients to re-connect
   socket.on 'disconnect', ->
     return unless id
     ship = registry.get id
     ship.is_active = no
-    socket.broadcast.emit 'remove', id: id
+    socket.broadcast.emit('remove', id: id)
 
   socket.on 'shift', (data) ->
     return unless id
-    socket.broadcast.emit 'shift', _.extend data, id: id
+    socket.broadcast.emit('shift', _.extend(data, id: id))
 
   socket.on 'move', (data) ->
     return unless id

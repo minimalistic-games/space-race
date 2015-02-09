@@ -9,11 +9,11 @@ define [
       radius: 40
 
     constructor: (world, options) ->
-      @options = _.extend {}, @defaults, options
+      @options = _.extend({}, @defaults, options)
       @coords = @options.coords
       @radius = @options.radius
       @view = new BaseView world.ctx
 
     render: ->
-      @view.applyColor @options.color, @options.opacity
-      @view.drawCircle @coords, @radius
+      @view.applyColor(@options.color, @options.opacity)
+      @view.drawCircle(@coords, @radius)

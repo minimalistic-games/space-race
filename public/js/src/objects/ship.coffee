@@ -14,12 +14,12 @@ define [
       bullets_limit: 100
 
     constructor: (@world, options) ->
-      _.extend @, Backbone.Events
+      _.extend(@, Backbone.Events)
 
-      @options = _.extend {}, @defaults, options
+      @options = _.extend({}, @defaults, options)
 
       # a helper object to delegate partial rendering
-      @view = new ShipView @world.ctx, @options.size
+      @view = new ShipView(@world.ctx, @options.size)
 
       @id = null
 
@@ -48,22 +48,24 @@ define [
       @initEvents()
 
     initEvents: ->
-      @listenTo @world, 'tick', @_shiftOnTick
-      @listenTo @world, 'tick', @_moveBlocksOnTick
+      @listenTo(@world, 'tick', @_shiftOnTick)
+      @listenTo(@world, 'tick', @_moveBlocksOnTick)
 
       @on 'control:shift', (data) ->
         @to_speed_up[data.direction] = not data.to_stop
-        @trigger 'stop' if data.to_stop and not @_isMoving()
+        @trigger('stop') if data.to_stop and not @_isMoving()
 
       @on 'control:weapon', (data) ->
         # start/stop charging a gun
-        @[if data.to_fire then 'stopListening' else 'listenTo'] @world, 'tick', @_queueBullet
+        @[if data.to_fire then 'stopListening' else 'listenTo'](@world,
+                                                                'tick',
+                                                                @_queueBullet)
 
         # fire all bullets, one at a time
-        @listenTo @world, 'tick', @_shot if data.to_fire
+        @listenTo(@world, 'tick', @_shot) if data.to_fire
 
       @on 'shot', ->
-        @stopListening @world, 'tick', @_shot unless @bullets_in_queue > 0
+        @stopListening(@world, 'tick', @_shot) unless @bullets_in_queue > 0
 
       @on 'render', ->
         bullet.render() for bullet in @bullets when bullet
@@ -72,19 +74,25 @@ define [
       @stopListening()
 
     render: ->
-      @view.applyColor @color, @opacity
-      @view.drawSquare @coords, @size
-      @view.text @id, @coords, -12
-      @view.text @bullets_in_queue or '', @coords, 12, 'end', 'bottom'
+      @view.applyColor(@color, @opacity)
+      @view.drawSquare(@coords, @size)
+      @view.text(@id,
+                 @coords,
+                 -12)
+      @view.text(@bullets_in_queue or '',
+                 @coords,
+                 12,
+                 'end',
+                 'bottom')
 
-      _.each @blocks, @_renderBlock.bind @
+      _.each(@blocks, @_renderBlock.bind @)
 
       @trigger 'render'
 
     changeColor: ->
       for i of @color
         random_sign = Math.round(Math.random() * 2) - 1
-        @color[i] = Math.min 100, @color[i] + random_sign * 10
+        @color[i] = Math.min(100, @color[i] + random_sign * 10)
 
     # e.g. (without "@_getBlockOffset()")
     #
@@ -117,7 +125,7 @@ define [
                                                (if to_speed_up then 1 else -2)
 
     _shiftOnTick: ->
-      @_shift direction, to_speed_up for direction, to_speed_up of @to_speed_up
+      @_shift(direction, to_speed_up) for direction, to_speed_up of @to_speed_up
 
     _shift: (direction, to_speed_up) ->
       if @_isFacingBound direction
@@ -140,7 +148,9 @@ define [
       no
 
     _isFacingBound: (direction) ->
-      @world.isObjectFacingBound @coords, @options.size, direction
+      @world.isObjectFacingBound(@coords,
+                                 @options.size,
+                                 direction)
 
     _queueBullet: ->
       @bullets_in_queue += 1 if @bullets_in_queue < @options.bullets_limit
@@ -153,7 +163,10 @@ define [
       @trigger 'shot'
 
     _createBullet: (direction) ->
-      bullet = new Bullet @world, _.clone(@coords), direction, color: @color
+      bullet = new Bullet(@world,
+                          _.clone(@coords),
+                          direction,
+                          color: @color)
 
       @bullets.push bullet
 

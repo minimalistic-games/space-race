@@ -33,6 +33,4 @@ gulp.task 'test', ->
   gulp.src './server/build/test/**/*.js'
     .pipe mocha reporter: 'spec'
 
-gulp.task 'default', [
-  'build'
-]
+gulp.task 'default', ['build']

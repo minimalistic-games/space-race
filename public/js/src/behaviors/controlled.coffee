@@ -25,19 +25,21 @@ define [
 
     _toggleDomEvents: (to_attach) ->
       for type, handler of @_dom_events
-        if to_attach then @_attachDomEvent type, handler else @_detachDomEvent type
+        if to_attach then @_attachDomEvent(type, handler) else @_detachDomEvent type
 
     _attachDomEvent: (type, handler) ->
       @_attached_dom_events[type] = handler.bind @
-      document.addEventListener type, @_attached_dom_events[type]
+      document.addEventListener(type, @_attached_dom_events[type])
 
     _detachDomEvent: (type) ->
-      document.removeEventListener type, @_attached_dom_events[type]
+      document.removeEventListener(type, @_attached_dom_events[type])
       delete @_attached_dom_events[type]
 
     _handleKey: (e) ->
       if e.keyCode in @_keys_codes
-        @trigger 'key', e.keyCode, 'keydown' is e.type
+        @trigger('key',
+                 e.keyCode,
+                 'keydown' is e.type)
 
   controlled._keys_codes = _.values controlled.keys
 

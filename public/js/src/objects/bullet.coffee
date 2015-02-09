@@ -12,11 +12,11 @@ define [
       speed_limit: 8
 
     constructor: (@world, @coords, @direction, options) ->
-      _.extend @, Backbone.Events
+      _.extend(@, Backbone.Events)
 
-      @options = _.extend {}, @defaults, options
+      @options = _.extend({}, @defaults, options)
 
-      @view = new BaseView @world.ctx, @options.size
+      @view = new BaseView(@world.ctx, @options.size)
 
       @size = @options.size
       @speed = @options.speed
@@ -25,18 +25,26 @@ define [
       @initEvents()
 
     initEvents: ->
-      @toggleMutators on, @shift, @fadeOut, @speadUp, @deflate
+      @toggleMutators(on,
+                      @shift,
+                      @fadeOut,
+                      @speadUp,
+                      @deflate)
 
       @on 'speed_limit', ->
-        @toggleMutators off, @speadUp, @deflate
-        @toggleMutators on, @slowDown, @inflate
+        @toggleMutators(off,
+                        @speadUp,
+                        @deflate)
+        @toggleMutators(on,
+                        @slowDown,
+                        @inflate)
 
       @on 'stop', ->
         @stopListening @world, 'tick'
 
     render: ->
-      @view.applyColor @options.color, @opacity
-      @view.drawSquare @coords, @size
+      @view.applyColor(@options.color, @opacity)
+      @view.drawSquare(@coords, @size)
 
     shift: ->
       axis = +(@direction in ['up', 'down'])
@@ -62,4 +70,4 @@ define [
       @opacity -= 0.01
 
     toggleMutators: (to_enable, mutators...) ->
-      @[if to_enable then 'listenTo' else 'stopListening'] @world, 'tick', mutator for mutator in mutators
+      @[if to_enable then 'listenTo' else 'stopListening'](@world, 'tick', mutator) for mutator in mutators

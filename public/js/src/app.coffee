@@ -18,7 +18,7 @@ define [
       @world = new World
       @world.ctx = ctx
 
-      bounds = new Bounds @world, color: [100, 150, 200]
+      bounds = new Bounds(@world, color: [100, 150, 200])
       @world.bounds = bounds
       @objects.bounds = bounds
 
@@ -34,11 +34,15 @@ define [
       @world.run()
 
     addControlledShip: ->
-      ship = new ControlledShip @world, color: [50, 50, 50], @socket
+      ship = new ControlledShip(@world,
+                                color: [50, 50, 50],
+                                @socket)
+
       ship.init => @objects.controlled_ship = ship
 
     listenServer: ->
-      # omits the "The connection to ... was interrupted while the page was loading." error in Firefox
+      # omits an error in Firefox:
+      # "The connection to ... was interrupted while the page was loading."
       window.onbeforeunload = =>
         @socket.close()
         return null

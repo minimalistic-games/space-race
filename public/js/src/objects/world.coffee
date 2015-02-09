@@ -8,7 +8,7 @@ define [
     _time_step: 10 # [ms]
 
     constructor: ->
-      _.extend @, Backbone.Events
+      _.extend(@, Backbone.Events)
 
     run: ->
       window.setInterval (=> @trigger 'tick'), @_time_step
@@ -29,7 +29,7 @@ define [
     generateStars: (amount) ->
       random_coord = (coord) =>
         center = @bounds[if coord is 0 then 'width' else 'height'] / 2
-        center - Math.round center * (Math.random() - 0.5)
+        center - Math.round(center * (Math.random() - 0.5))
 
       random_color = ->
         Math.round 255 * Math.random()
@@ -37,7 +37,8 @@ define [
       random_radius = ->
         10 + Math.round 400 * Math.random()
 
-      _.times amount, => new Star @,
-                            coords: _.times 2, (i) -> random_coord i
-                            color: _.times 3, random_color
-                            radius: random_radius()
+      _.times amount, =>
+        new Star @,
+          coords: _.times(2, (i) -> random_coord i)
+          color: _.times(3, random_color)
+          radius: random_radius()

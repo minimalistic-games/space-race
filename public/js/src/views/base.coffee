@@ -4,10 +4,10 @@ define [
     constructor: (@ctx) ->
 
     applyColor: (color, opacity) ->
-      @ctx.fillStyle = @_rgba color, opacity
+      @ctx.fillStyle = @_rgba(color, opacity)
 
     applyStrokeColor: (color, opacity) ->
-      @ctx.strokeStyle = @_rgba color, opacity
+      @ctx.strokeStyle = @_rgba(color, opacity)
 
     drawCircle: (coords, radius) ->
       @ctx.beginPath()
