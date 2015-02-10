@@ -11,7 +11,7 @@ canvas 'n' node multiplayer game
 2. install bower deps: `cd public/js/ && bower install && cd ../../`
 3. compile [with watch]: `gulp [watch]`
 4. run the back-end: `node server/build/app`
-5. open app in browser: `localhost:3000` (port specified in the [server config](/server/src/config/server.coffee))
+5. open app in browser: `localhost:3000` (see [config](/server/src/config/server.coffee))
 
 
 ## to run tests
@@ -26,7 +26,7 @@ canvas 'n' node multiplayer game
 * move: `arrows`
 * fire: `ctrl` (hold to charge a gun and free to fire in moving directions)
 
-details in code: [controllable.coffee](/public/js/src/behaviors/controllable.coffee)
+details in code: [controlled.coffee](/public/js/src/behaviors/controlled.coffee)
 
 
 ## screenshots
