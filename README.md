@@ -31,7 +31,7 @@ details in code: [controlled.coffee](/public/js/src/behaviors/controlled.coffee)
 
 ## screenshots
 
-![screenshot](https://raw.githubusercontent.com/markhovskiy/markhovskiy.github.io/master/uploads/space_race_screenshot.png)
+![screenshot](https://raw.githubusercontent.com/oleksmarkh/oleksmarkh.github.io/master/uploads/space_race_screenshot.png)
 
 
 ## todo
