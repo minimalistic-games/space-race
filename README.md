@@ -1,6 +1,6 @@
 # space-race
 
-[![Dependency Status](https://david-dm.org/markhovskiy/space-race.svg?style=flat)](https://david-dm.org/markhovskiy/space-race)
+[![Dependency Status](https://david-dm.org/oleksmarkh/space-race.svg?style=flat)](https://david-dm.org/oleksmarkh/space-race)
 
 canvas 'n' node multiplayer game
 
