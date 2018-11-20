@@ -41,6 +41,8 @@ details in code: [controlled.coffee](/public/js/src/behaviors/controlled.coffee)
 
 [travis-image]: https://img.shields.io/travis/oleksmarkh/space-race/master.svg?style=flat-square
 [travis-url]: https://travis-ci.org/oleksmarkh/space-race
+[deps-image]: https://img.shields.io/david/oleksmarkh/space-race.svg?style=flat-square
+[deps-url]: https://david-dm.org/oleksmarkh/space-race
 [license-image]: https://img.shields.io/github/license/oleksmarkh/space-race.svg?style=flat-square
 [license-url]: https://github.com/oleksmarkh/space-race/blob/master/LICENSE
 [code-size-image]: https://img.shields.io/github/languages/code-size/oleksmarkh/space-race.svg?style=flat-square
