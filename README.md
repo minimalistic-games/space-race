@@ -1,9 +1,11 @@
 # space-race
 
-[![Dependency Status](https://david-dm.org/oleksmarkh/space-race.svg?style=flat)](https://david-dm.org/oleksmarkh/space-race)
+  [![travis][travis-image]][travis-url]
+  [![deps][deps-image]][deps-url]
+  [![license][license-image]][license-url]
+  ![code size][code-size-image]
 
 canvas 'n' node multiplayer game
-
 
 ## to run locally
 
@@ -13,11 +15,9 @@ canvas 'n' node multiplayer game
 4. run the back-end: `node server/build/app`
 5. open app in browser: `localhost:3000` (see [config](/server/src/config/server.coffee))
 
-
 ## to run tests
 
 `gulp test`
-
 
 ## to play
 
@@ -28,11 +28,9 @@ canvas 'n' node multiplayer game
 
 details in code: [controlled.coffee](/public/js/src/behaviors/controlled.coffee)
 
-
 ## screenshots
 
 ![screenshot](https://raw.githubusercontent.com/oleksmarkh/oleksmarkh.github.io/master/uploads/space_race_screenshot.png)
-
 
 ## todo
 
@@ -40,3 +38,9 @@ details in code: [controlled.coffee](/public/js/src/behaviors/controlled.coffee)
 - [ ] remove static "bounds", make an auto-scrollable map that fills all the window (introduce global coords origin instead of [0, 0] of the canvas)
 - [ ] add zoom O_o
 - [ ] add mini-map
+
+[travis-image]: https://img.shields.io/travis/oleksmarkh/space-race/master.svg?style=flat-square
+[travis-url]: https://travis-ci.org/oleksmarkh/space-race
+[license-image]: https://img.shields.io/github/license/oleksmarkh/space-race.svg?style=flat-square
+[license-url]: https://github.com/oleksmarkh/space-race/blob/master/LICENSE
+[code-size-image]: https://img.shields.io/github/languages/code-size/oleksmarkh/space-race.svg?style=flat-square
