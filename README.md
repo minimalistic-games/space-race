@@ -1,7 +1,7 @@
 # space-race
 
-  [![travis][travis-image]][travis-url]
-  [![deps][deps-image]][deps-url]
+  <!-- [![travis][travis-image]][travis-url] -->
+  <!-- [![deps][deps-image]][deps-url] -->
   [![license][license-image]][license-url]
   ![code size][code-size-image]
 
@@ -39,10 +39,10 @@ details in code: [controlled.coffee](/public/js/src/behaviors/controlled.coffee)
 - [ ] add zoom O_o
 - [ ] add mini-map
 
-[travis-image]: https://img.shields.io/travis/oleksmarkh/space-race/master.svg?style=flat-square
-[travis-url]: https://travis-ci.org/oleksmarkh/space-race
-[deps-image]: https://img.shields.io/david/oleksmarkh/space-race.svg?style=flat-square
-[deps-url]: https://david-dm.org/oleksmarkh/space-race
-[license-image]: https://img.shields.io/github/license/oleksmarkh/space-race.svg?style=flat-square
-[license-url]: https://github.com/oleksmarkh/space-race/blob/master/LICENSE
-[code-size-image]: https://img.shields.io/github/languages/code-size/oleksmarkh/space-race.svg?style=flat-square
+<!-- [travis-image]: https://img.shields.io/travis/minimalistic-games/space-race/master.svg?style=flat-square -->
+<!-- [travis-url]: https://travis-ci.org/minimalistic-games/space-race -->
+<!-- [deps-image]: https://img.shields.io/david/minimalistic-games/space-race.svg?style=flat-square -->
+<!-- [deps-url]: https://david-dm.org/minimalistic-games/space-race -->
+[license-image]: https://img.shields.io/github/license/minimalistic-games/space-race.svg?style=flat-square
+[license-url]: https://github.com/minimalistic-games/space-race/blob/master/LICENSE
+[code-size-image]: https://img.shields.io/github/languages/code-size/minimalistic-games/space-race.svg?style=flat-square
